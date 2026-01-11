@@ -1,0 +1,20 @@
+# Environment Variables (Secrets)
+.env
+service_account.json
+
+# Python
+__pycache__/
+*.pyc
+venv/
+env/
+.pytest_cache/
+
+# Temporary Files
+models.txt
+available_models.txt
+test_client.py # Optional: commonly excluded if it's just a local test script, but user might want it. keeping it is usually fine for hackathons.
+# I will keep test_client.py as it is useful for the team.
+
+# OS
+.DS_Store
+Thumbs.db
