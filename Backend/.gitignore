@@ -1,0 +1,12 @@
+# Dependencies
+node_modules/
+
+# Environment variables
+.env
+
+# Firebase Service Account Key (SENSITIVE!)
+config/serviceAccountKey.json
+
+# Misc
+.DS_Store
+*.log
