@@ -69,12 +69,10 @@ In colleges and campuses:
 - Text similarity using embeddings
 - Basic rule-based matching (hackathon-safe)
 
-### Google Technologies Used
+- Google AI Studio (Gemini API)
 - Firebase Authentication
 - Firebase Firestore
 - Firebase Storage
-- Google Vision API
-- Google Cloud Functions
 
 > ⚠️ Only **free tier / trial credits** are used
 
@@ -86,7 +84,7 @@ In colleges and campuses:
 |----|----|
 | Frontend | UI, Forms, Pages, Hosting |
 | Backend | APIs, Database, Auth |
-| AI/ML | Image matching, text similarity |
+| AI/ML | Image matching (Gemini 1.5), text similarity |
 
 ---
 
@@ -180,7 +178,7 @@ This project is built for **educational and hackathon purposes**.
 
 ## 🙌 Acknowledgements
 
-* Google Cloud Platform
+* Google AI Studio (Gemini)
 * Firebase
 * Open-source community
 * Hackathon mentors
