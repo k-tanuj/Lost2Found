@@ -65,11 +65,9 @@ In colleges and campuses:
 - Firebase Firestore (Database)
 
 ### AI / ML
-- Google Vision API (Image Analysis)
-- Text similarity using embeddings
-- Basic rule-based matching (hackathon-safe)
-
-- Google AI Studio (Gemini API)
+- Google AI Studio (Gemini 1.5 Flash) - Image Analysis
+- Jaccard Similarity Algorithm - Keyword Matching
+- Basic rule-based logic (hackathon-safe)
 - Firebase Authentication
 - Firebase Firestore
 - Firebase Storage
