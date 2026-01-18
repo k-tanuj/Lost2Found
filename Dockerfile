@@ -14,6 +14,7 @@ RUN echo "VITE_FIREBASE_STORAGE_BUCKET=lost2found-66698.firebasestorage.app" >> 
 RUN echo "VITE_FIREBASE_MESSAGING_SENDER_ID=246647655293" >> .env
 RUN echo "VITE_FIREBASE_APP_ID=1:246647655293:web:fc17401bf09c6bebe49a14" >> .env
 RUN echo "VITE_FIREBASE_MEASUREMENT_ID=G-HYZ81F6GF9" >> .env
+RUN echo "VITE_API_URL=/api" >> .env
 
 RUN npm run build
 
