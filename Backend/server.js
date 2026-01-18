@@ -61,6 +61,6 @@ app.listen(PORT, () => {
 });
 
 // SPA Fallback - Send all other requests to index.html
-app.get('*', (req, res) => {
+app.get('/*', (req, res) => {
     res.sendFile(path.join(DIST_PATH, 'index.html'));
 });
