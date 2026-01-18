@@ -1,0 +1,12 @@
+node_modules
+dist
+build
+venv
+__pycache__
+.git
+.env
+.DS_Store
+Backend/node_modules
+frontend/node_modules
+AIML/venv
+AIML/__pycache__

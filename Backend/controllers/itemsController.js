@@ -1,0 +1,319 @@
+const { db, storage, auth: adminAuth } = require('../firebase');
+const { drive } = require('../utils/googleClient');
+const cloudinary = require('../utils/cloudinary'); // Load Cloudinary config on startup
+const stream = require('stream');
+const axios = require('axios');
+const QRCode = require('qrcode');
+const { sendEmail } = require('../utils/email');
+
+exports.getItems = async (req, res) => {
+    try {
+        const { type } = req.params; // 'lost' or 'found'
+
+        let query = db.collection('items');
+        if (type && type !== 'all') {
+            query = query.where('type', '==', type);
+        }
+
+        const snapshot = await query.orderBy('date', 'desc').get();
+
+        const items = [];
+        snapshot.forEach(doc => {
+            items.push({ id: doc.id, ...doc.data() });
+        });
+
+        res.json(items);
+    } catch (error) {
+        console.error("Error getting items:", error);
+        res.status(500).json({ error: "Failed to fetch items" });
+    }
+};
+
+exports.getUserItems = async (req, res) => {
+    try {
+        const { userId } = req.params;
+        const snapshot = await db.collection('items')
+            .where('userId', '==', userId)
+            .get();
+
+        const items = [];
+        snapshot.forEach(doc => {
+            items.push({ id: doc.id, ...doc.data() });
+        });
+        res.json(items);
+    } catch (error) {
+        console.error("Error getting user items:", error);
+        res.status(500).json({ error: "Failed to fetch user items" });
+    }
+};
+
+exports.createItem = async (req, res) => {
+    try {
+        const { type } = req.params;
+        let imageUrl = req.body.imageUrl || '';
+
+
+        // 1. Cloudinary Image Upload
+        if (req.file) {
+            try {
+                const cloudinary = require('../utils/cloudinary');
+
+                // Upload to Cloudinary using upload_stream
+                const result = await new Promise((resolve, reject) => {
+                    const uploadStream = cloudinary.uploader.upload_stream(
+                        {
+                            folder: 'lost2found',
+                            resource_type: 'auto',
+                            transformation: [
+                                { width: 1200, height: 1200, crop: 'limit' },
+                                { quality: 'auto:good' }
+                            ]
+                        },
+                        (error, result) => {
+                            if (error) reject(error);
+                            else resolve(result);
+                        }
+                    );
+                    uploadStream.end(req.file.buffer);
+                });
+
+                imageUrl = result.secure_url;
+
+            } catch (err) {
+                console.error("❌ Cloudinary Upload Error:", err.message);
+                imageUrl = '';
+            }
+        }
+
+
+        // 2. AI Image Analysis (Get Tags/Meta)
+        let aiMetadata = {};
+        if (req.file) {
+            try {
+                // Need to use 'axios' and 'form-data' for Node.js file upload
+                const NodeFormData = require('form-data');
+                const aiData = new NodeFormData();
+                aiData.append('file', req.file.buffer, { filename: req.file.originalname, contentType: req.file.mimetype });
+
+                const aiResponse = await axios.post(`${process.env.AI_SERVICE_URL || 'http://127.0.0.1:8000'}/analyze-image`, aiData, {
+                    headers: { ...aiData.getHeaders() }
+                });
+
+                aiMetadata = aiResponse.data; // { labels, category, description, colors }
+                console.log("AI Analysis Result:", aiMetadata);
+
+            } catch (aiErr) {
+                console.error("AI Analysis Failed:", aiErr.message);
+            }
+        }
+
+        const itemData = {
+            type: type || req.body.type || 'lost',
+            ...req.body,
+            imageUrl: imageUrl,
+            date: new Date().toISOString(),
+            userId: req.user.uid,
+            // Merge AI Data (prioritize AI if field missing)
+            labels: aiMetadata.labels || [],
+            colors: aiMetadata.colors || [],
+            category: req.body.category || aiMetadata.category || 'Uncategorized', // Prefer user input
+            description: req.body.description || aiMetadata.description || ''
+        };
+
+        const docRef = await db.collection('items').add(itemData);
+
+        // Sheets logging removed per user request
+
+
+
+        res.status(201).json({ success: true, item: { id: docRef.id, ...itemData } });
+    } catch (error) {
+        console.error("Error creating item:", error);
+        res.status(500).json({ error: "Failed to create item" });
+    }
+}
+
+
+exports.getItemById = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const doc = await db.collection('items').doc(id).get();
+        if (!doc.exists) {
+            return res.status(404).json({ error: "Item not found" });
+        }
+
+        const itemData = { id: doc.id, ...doc.data() };
+
+        // Generate QR Code for this item (using frontend URL)
+        const frontendUrl = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/item/${id}`;
+        const qrCodeDataUrl = await QRCode.toDataURL(frontendUrl);
+        itemData.qrCode = qrCodeDataUrl;
+
+        res.json(itemData);
+    } catch (error) {
+        console.error("Error getting item:", error);
+        res.status(500).json({ error: "Failed to fetch item" });
+    }
+};
+
+exports.claimItem = async (req, res) => {
+    const { itemId, message, proof } = req.body;
+    const claimantId = req.user.uid;
+    const claimantName = req.user.name || 'A user';
+    const claimantEmail = req.user.email || 'Someone';
+
+    try {
+        // 1. Throttling: Check if user has too many active claims
+        const activeClaimsSnapshot = await db.collection('notifications')
+            .where('relatedUserId', '==', claimantId)
+            .where('type', '==', 'claim_request')
+            .where('read', '==', false)
+            .get();
+
+        if (activeClaimsSnapshot.size >= 5) {
+            return res.status(403).json({ error: "Limit reached: You have 5 pending claim requests. Please resolve them first." });
+        }
+
+        const itemRef = db.collection('items').doc(itemId);
+
+        const result = await db.runTransaction(async (t) => {
+            const itemDoc = await t.get(itemRef);
+
+            if (!itemDoc.exists) {
+                throw new Error("Item not found");
+            }
+
+            const itemData = itemDoc.data();
+
+            // 1. Prevent self-claim
+            if (itemData.userId === claimantId) {
+                throw new Error("You cannot claim your own item.");
+            }
+
+            // 2. Prevent multiple claims if already processed
+            if (itemData.status && !['active', 'lost', 'found', 'reported'].includes(itemData.status.toLowerCase())) {
+                throw new Error(`Item is already ${itemData.status}`);
+            }
+
+            // 3. Update status to CLAIMED
+            t.update(itemRef, {
+                status: 'CLAIMED',
+                claimantId: claimantId,
+                claimedAt: new Date().toISOString()
+            });
+
+            // 4. Create Notification
+            const notifRef = db.collection('notifications').doc();
+            const notification = {
+                userId: itemData.userId, // Notify owner
+                type: 'CLAIM_REQUEST',
+                title: 'Action Required: Item Claimed!',
+                message: `${claimantName} wants to claim your "${itemData.title}".`,
+                claimantProof: proof || "No additional proof provided.",
+                claimantMessage: message || "",
+                itemId: itemId,
+                relatedUserId: claimantId,
+                read: false,
+                status: 'ACTION_REQUIRED',
+                priority: 'HIGH',
+                createdAt: new Date().toISOString()
+            };
+            t.set(notifRef, notification);
+
+            return { itemData, notification };
+        });
+
+        // 5. Send Real Email Alert to the Item Owner
+        try {
+            const ownerUser = await adminAuth.getUser(result.itemData.userId);
+            const ownerEmail = ownerUser.email;
+
+            if (ownerEmail) {
+                const subject = `🚀 Claim Request: ${result.itemData.title}`;
+                const text = `Hello! Someone has claimed your item "${result.itemData.title}" on Lost2Found.`;
+                const html = `
+                    <div style="font-family: sans-serif; padding: 20px; color: #333;">
+                        <h2 style="color: #4f46e5;">Good News!</h2>
+                        <p>Hi there,</p>
+                        <p><strong>${claimantName}</strong> has just submitted a claim request for your item: <strong>"${result.itemData.title}"</strong>.</p>
+                        <div style="background: #f3f4f6; padding: 15px; border-radius: 8px; margin: 20px 0;">
+                            <p style="margin: 0;"><strong>Claimant Message:</strong> ${message || 'No message provided.'}</p>
+                            <p style="margin: 5px 0 0 0;"><strong>Claimant Email:</strong> ${claimantEmail}</p>
+                        </div>
+                        <p>Please log in to the app to review their proof and finalize the return.</p>
+                        <a href="${process.env.FRONTEND_URL || 'http://localhost:5173'}/activity" 
+                           style="display: inline-block; background: #6366f1; color: white; padding: 12px 24px; border-radius: 10px; text-decoration: none; font-weight: bold;">
+                           Review Claim Request
+                        </a>
+                        <p style="font-size: 12px; color: #9ca3af; margin-top: 30px;">Lost2Found System Notification</p>
+                    </div>
+                `;
+
+                await sendEmail(ownerEmail, subject, text, html);
+            }
+        } catch (emailErr) {
+            console.error("Failed to lookup owner or send email:", emailErr.message);
+        }
+
+        res.json({ success: true, message: "Claim request processed successfully" });
+
+    } catch (error) {
+        console.error("Claim Transaction Failed:", error.message);
+        res.status(400).json({ error: error.message });
+    }
+};
+
+exports.updateItemStatus = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { status } = req.body; // 'active', 'claimed', 'returned', 'secured'
+
+        if (!status) {
+            return res.status(400).json({ error: "Status is required" });
+        }
+
+        const itemRef = db.collection('items').doc(id);
+        const itemDoc = await itemRef.get();
+
+        if (!itemDoc.exists) {
+            return res.status(404).json({ error: "Item not found" });
+        }
+
+        const itemData = itemDoc.data();
+
+        await itemRef.update({
+            status: status,
+            updatedAt: new Date().toISOString(),
+            resolvedAt: (status === 'returned' || status === 'secured') ? new Date().toISOString() : null
+        });
+
+        // Notify Claimant via Email if item is returned/secured
+        if ((status === 'returned' || status === 'secured') && itemData.claimantId) {
+            try {
+                const claimantUser = await adminAuth.getUser(itemData.claimantId);
+                const claimantEmail = claimantUser.email;
+
+                if (claimantEmail) {
+                    const subject = `✨ Success! Your claim for "${itemData.title}" is ready`;
+                    const html = `
+                        <div style="font-family: sans-serif; padding: 20px; color: #333;">
+                            <h2 style="color: #059669;">Great News!</h2>
+                            <p>The owner of <strong>"${itemData.title}"</strong> has updated the status to: <strong style="text-transform: uppercase;">${status}</strong>.</p>
+                            <p>This means your claim has been processed. If the item was "Secured at Office", you can now head there to collect it. If it was "Returned", we hope you're happy to have your item back!</p>
+                            <p style="margin-top: 20px;">Thank you for using Lost2Found to foster a more honest community.</p>
+                            <p style="font-size: 12px; color: #9ca3af; margin-top: 30px;">Lost2Found System Notification</p>
+                        </div>
+                    `;
+                    await sendEmail(claimantEmail, subject, `Your claim for ${itemData.title} is now ${status}!`, html);
+                }
+            } catch (err) {
+                console.error("Failed to notify claimant:", err.message);
+            }
+        }
+
+        res.json({ success: true, status });
+    } catch (error) {
+        console.error("Error updating item status:", error);
+        res.status(500).json({ error: "Failed to update item status" });
+    }
+};

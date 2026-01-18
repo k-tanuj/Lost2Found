@@ -1,0 +1,34 @@
+# Environment Variables (Secrets)
+.env
+service_account.json
+serviceAccountKey.json
+
+# Node
+node_modules/
+dist/
+build/
+.next/
+out/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Python
+__pycache__/
+*.pyc
+venv/
+env/
+.pytest_cache/
+
+# Temporary Files
+models.txt
+available_models.txt
+test_client.py
+
+# OS
+
+# Valid VS Code settings
+.vscode/
+
+# Project Specific
+*.log

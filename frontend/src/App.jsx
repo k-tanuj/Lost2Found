@@ -1,0 +1,103 @@
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { AuthProvider, useAuth } from './context/AuthContext';
+import Login from './pages/Login';
+import Dashboard from './pages/Dashboard';
+import Report from './pages/Report';
+import Matches from './pages/Matches';
+import Search from './pages/Search';
+import Activity from './pages/Activity';
+import MyReports from './pages/MyReports';
+import Profile from './pages/Profile';
+import ItemDetail from './pages/ItemDetail';
+import Guide from './pages/Guide';
+import { NotificationProvider } from './context/NotificationContext';
+import { ThemeProvider } from './context/ThemeContext';
+import { AnimatePresence, motion } from 'framer-motion';
+
+// Protected Route Component
+const PrivateRoute = ({ children }) => {
+  const { currentUser } = useAuth();
+  return currentUser ? children : <Navigate to="/" />;
+};
+
+const AnimatedRoutes = () => {
+  const location = useLocation();
+
+  return (
+    <AnimatePresence mode="wait">
+      <Routes location={location} key={location.pathname}>
+        <Route path="/" element={<Login />} />
+        <Route
+          path="/dashboard"
+          element={
+            <PrivateRoute>
+              <PageWrapper><Dashboard /></PageWrapper>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/activity"
+          element={
+            <PrivateRoute>
+              <PageWrapper><Activity /></PageWrapper>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/report"
+          element={
+            <PrivateRoute>
+              <PageWrapper><Report /></PageWrapper>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/matches/:id"
+          element={
+            <PrivateRoute>
+              <PageWrapper><Matches /></PageWrapper>
+            </PrivateRoute>
+          }
+        />
+        <Route path="/search" element={<PrivateRoute><PageWrapper><Search /></PageWrapper></PrivateRoute>} />
+        <Route path="/my-reports" element={<PrivateRoute><PageWrapper><MyReports /></PageWrapper></PrivateRoute>} />
+        <Route path="/profile" element={<PrivateRoute><PageWrapper><Profile /></PageWrapper></PrivateRoute>} />
+        <Route path="/item/:id" element={<PrivateRoute><PageWrapper><ItemDetail /></PageWrapper></PrivateRoute>} />
+        <Route path="/guide" element={<PrivateRoute><PageWrapper><Guide /></PageWrapper></PrivateRoute>} />
+      </Routes>
+    </AnimatePresence>
+  );
+};
+
+const PageWrapper = ({ children }) => (
+  <motion.div
+    initial={{ opacity: 0, y: 10 }}
+    animate={{ opacity: 1, y: 0 }}
+    exit={{ opacity: 0, y: -10 }}
+    transition={{ duration: 0.2, ease: "easeOut" }}
+    className="w-full"
+  >
+    {children}
+  </motion.div>
+);
+
+function App() {
+  return (
+    <ThemeProvider>
+      <NotificationProvider>
+        <AuthProvider>
+          <Router>
+            <div className="min-h-screen bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans transition-colors duration-300">
+
+              {/* Use conditional rendering for Navbar here if needed */}
+
+              <AnimatedRoutes />
+            </div>
+          </Router>
+        </AuthProvider>
+      </NotificationProvider>
+    </ThemeProvider>
+  );
+}
+
+export default App;
