@@ -5,7 +5,7 @@ import { MapPin, Calendar, ArrowRight } from 'lucide-react';
 export default function ItemCard({ item, onClick }) {
     const getEmbedUrl = (url) => {
         if (!url) return null;
-        if (url.startsWith('/uploads/')) return `http://localhost:5000${url}`;
+        if (url.startsWith('/uploads/')) return url; // Relative path works in prod and dev (via proxy)
         if (url.includes('drive.google.com/thumbnail')) return url;
         if (url.includes('drive.google.com/uc')) {
             const idMatch = url.match(/id=([^&]+)/);
