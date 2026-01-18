@@ -147,7 +147,9 @@ exports.getItemById = async (req, res) => {
         const itemData = { id: doc.id, ...doc.data() };
 
         // Generate QR Code for this item (using frontend URL)
-        const frontendUrl = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/item/${id}`;
+        // Hugging Face exposes SPACE_HOST. If not set, use custom FRONTEND_URL or fallback to localhost
+        const host = process.env.SPACE_HOST ? `https://${process.env.SPACE_HOST}` : (process.env.FRONTEND_URL || 'http://localhost:5173');
+        const frontendUrl = `${host}/item/${id}`;
         const qrCodeDataUrl = await QRCode.toDataURL(frontendUrl);
         itemData.qrCode = qrCodeDataUrl;
 
