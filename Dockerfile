@@ -18,8 +18,8 @@ RUN npm run build
 # 2. Setup Backend & Python Environment
 FROM node:18-bullseye
 
-# Install Python 3.9 and pip
-RUN apt-get update && apt-get install -y python3 python3-pip python3-venv
+# Install Python 3.10 and pip
+RUN apt-get update && apt-get install -y python3.10 python3.10-venv python3-pip
 
 WORKDIR /app
 
@@ -35,7 +35,7 @@ COPY --from=builder /app/frontend/dist ./frontend/dist
 WORKDIR /app/AIML
 COPY AIML/requirements.txt .
 # Create venv to avoid conflicts
-RUN python3 -m venv venv
+RUN python3.10 -m venv venv
 RUN ./venv/bin/pip install --no-cache-dir -r requirements.txt
 COPY AIML/ .
 

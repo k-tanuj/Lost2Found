@@ -10,13 +10,29 @@ const admin = require('firebase-admin');
 // NOTE: User must provide GOOGLE_APPLICATION_CREDENTIALS path in .env
 // OR populate individual fields.
 
-const serviceAccount = require('./serviceAccountKey.json');
+console.log("Initializing Firebase Admin...");
 
-console.log("Initializing Firebase Admin with Service Account...");
+let serviceAccount;
+
+if (process.env.FIREBASE_SERVICE_ACCOUNT) {
+    try {
+        // Handle if the secret is passed as a string/JSON
+        serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
+    } catch (e) {
+        console.error("Failed to parse FIREBASE_SERVICE_ACCOUNT", e);
+    }
+} else {
+    // Fallback for local dev if file exists (optional, or error out)
+    try {
+        serviceAccount = require('./serviceAccountKey.json');
+    } catch (e) {
+        console.warn("No serviceAccountKey.json found and no ENV var set.");
+    }
+}
 
 admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
-    storageBucket: 'lost2found-66698.appspot.com' // Explicit bucket for Hackathon
+    storageBucket: process.env.VITE_FIREBASE_STORAGE_BUCKET || 'lost2found-66698.firebasestorage.app'
 });
 
 const db = admin.firestore();
