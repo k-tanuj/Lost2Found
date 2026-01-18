@@ -4,6 +4,7 @@ import { useTheme } from '../context/ThemeContext';
 import { Radar, LogOut, User, Moon, Sun } from 'lucide-react';
 import NotificationBell from './NotificationBell';
 import ActionBanner from './ActionBanner';
+import BottomNav from './BottomNav';
 import { useState, useEffect } from 'react';
 import { db } from '../firebase';
 import { collection, query, where, onSnapshot } from 'firebase/firestore';
@@ -117,6 +118,11 @@ export default function Navbar() {
                     </div>
                 </div>
             </nav>
+            {currentUser && (
+                <div className="md:hidden">
+                    <BottomNav />
+                </div>
+            )}
         </>
     );
 }

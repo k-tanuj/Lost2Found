@@ -225,12 +225,7 @@ export default function Login() {
                             Get Started
                             <ArrowRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
                         </button>
-                        <button
-                            onClick={handleGuestLogin}
-                            className="px-12 py-6 bg-slate-900/50 border border-white/10 text-white font-black rounded-3xl hover:bg-white/10 transition-all active:scale-95 backdrop-blur-md"
-                        >
-                            Explore Demo
-                        </button>
+
                     </div>
                 </motion.div>
 
@@ -346,12 +341,7 @@ export default function Login() {
                                 <ArrowRight className="w-6 h-6 text-slate-400 group-hover:translate-x-1 group-hover:text-indigo-600 transition-all" />
                             </motion.button>
 
-                            <button
-                                onClick={handleGuestLogin}
-                                className="w-full py-7 bg-white/5 border border-white/10 rounded-[32px] font-black text-lg hover:bg-white/10 transition-all active:scale-95 text-slate-400 hover:text-white"
-                            >
-                                Continue as Guest
-                            </button>
+
                         </div>
                     </div>
                 </motion.div>
