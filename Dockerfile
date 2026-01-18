@@ -1,11 +1,12 @@
+# 1. Build Frontend
 FROM node:18-bullseye as builder
 
-# 1. Build Frontend
 WORKDIR /app/frontend
 COPY frontend/package*.json ./
 RUN npm install
 COPY frontend/ .
-# Create .env for build (Public Keys Only)
+
+# Inject Public ENV Vars for Build
 RUN echo "VITE_FIREBASE_API_KEY=AIzaSyDjZ5fxBFibryTueJvUgvG7pDamGqyHwbk" > .env
 RUN echo "VITE_FIREBASE_AUTH_DOMAIN=lost2found-66698.firebaseapp.com" >> .env
 RUN echo "VITE_FIREBASE_PROJECT_ID=lost2found-66698" >> .env
@@ -13,19 +14,17 @@ RUN echo "VITE_FIREBASE_STORAGE_BUCKET=lost2found-66698.firebasestorage.app" >> 
 RUN echo "VITE_FIREBASE_MESSAGING_SENDER_ID=246647655293" >> .env
 RUN echo "VITE_FIREBASE_APP_ID=1:246647655293:web:fc17401bf09c6bebe49a14" >> .env
 RUN echo "VITE_FIREBASE_MEASUREMENT_ID=G-HYZ81F6GF9" >> .env
+
 RUN npm run build
 
-# 2. Setup Backend & Python Environment
-FROM node:18-bullseye
+# 2. Final Run Stage (Python 3.10 Base)
+FROM python:3.10-slim-bullseye
 
-# Install Python 3.10 and pip via deadsnakes PPA (since Bullseye default is 3.9)
-RUN apt-get update && apt-get install -y software-properties-common && \
-    add-apt-repository ppa:deadsnakes/ppa && \
-    apt-get update && \
-    apt-get install -y python3.10 python3.10-venv python3.10-distutils python3-pip curl
-
-# Ensure pip for 3.10
-RUN curl -sS https://bootstrap.pypa.io/get-pip.py | python3.10
+# Install Node.js 18 on Debian Bullseye
+RUN apt-get update && apt-get install -y curl gnupg && \
+    curl -fsSL https://deb.nodesource.com/setup_18.x | bash - && \
+    apt-get install -y nodejs && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
@@ -40,8 +39,8 @@ COPY --from=builder /app/frontend/dist ./frontend/dist
 # Setup AI Service
 WORKDIR /app/AIML
 COPY AIML/requirements.txt .
-# Create venv to avoid conflicts
-RUN python3.10 -m venv venv
+# Create venv
+RUN python3 -m venv venv
 RUN ./venv/bin/pip install --no-cache-dir -r requirements.txt
 COPY AIML/ .
 
