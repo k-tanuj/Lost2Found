@@ -20,8 +20,10 @@ GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
 def get_gemini_model():
     """Configures and returns the Gemini model."""
-    if not GEMINI_API_KEY or "PASTE_YOUR" in GEMINI_API_KEY:
-        print("⚠️ WARNING: GEMINI_API_KEY is missing or invalid in .env file.")
+    GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+    if not GEMINI_API_KEY:
+        print("⚠️ ACTION REQUIRED: GEMINI_API_KEY is missing in environment variables.")
+        print("   If deploying to Hugging Face, add it in Settings -> Secrets.")
         return None
     
     genai.configure(api_key=GEMINI_API_KEY)
