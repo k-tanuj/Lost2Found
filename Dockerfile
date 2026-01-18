@@ -18,8 +18,14 @@ RUN npm run build
 # 2. Setup Backend & Python Environment
 FROM node:18-bullseye
 
-# Install Python 3.10 and pip
-RUN apt-get update && apt-get install -y python3.10 python3.10-venv python3-pip
+# Install Python 3.10 and pip via deadsnakes PPA (since Bullseye default is 3.9)
+RUN apt-get update && apt-get install -y software-properties-common && \
+    add-apt-repository ppa:deadsnakes/ppa && \
+    apt-get update && \
+    apt-get install -y python3.10 python3.10-venv python3.10-distutils python3-pip curl
+
+# Ensure pip for 3.10
+RUN curl -sS https://bootstrap.pypa.io/get-pip.py | python3.10
 
 WORKDIR /app
 
