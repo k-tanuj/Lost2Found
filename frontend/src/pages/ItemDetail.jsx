@@ -113,7 +113,9 @@ export default function ItemDetail() {
                                 <div className="w-5 h-5 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-[10px] font-bold text-slate-500 dark:text-slate-400">ID</div>
                                 <div className="flex flex-col">
                                     <span className="text-[10px] font-bold uppercase tracking-widest opacity-50">Reported By</span>
-                                    <span className="font-mono text-xs select-all">{item.userId || 'Anonymous'}</span>
+                                    <span className="font-mono text-xs select-all text-indigo-600 dark:text-indigo-400 font-bold">
+                                        {item.userEmail || item.userId || 'Anonymous'}
+                                    </span>
                                 </div>
                             </div>
                         </div>

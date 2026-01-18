@@ -113,6 +113,8 @@ exports.createItem = async (req, res) => {
             imageUrl: imageUrl,
             date: new Date().toISOString(),
             userId: req.user.uid,
+            userEmail: req.user.email || 'Anonymous', // Save email for display
+            userName: req.user.name || 'Anonymous',   // Save name for display
             // Merge AI Data (prioritize AI if field missing)
             labels: aiMetadata.labels || [],
             colors: aiMetadata.colors || [],
