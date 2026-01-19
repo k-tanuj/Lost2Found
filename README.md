@@ -118,4 +118,4 @@ Lost2Found/
 
 ## 👥 Authors
 
-Built by **Team Lost2Found** for the **ISEC Data Challenge**.
+Built by **Team Lost2Found**.
