@@ -103,15 +103,10 @@ export default function NotificationBell() {
                                         if (!notif.read && notif.status !== 'ACTION_REQUIRED') {
                                             handleMarkRead(notif.id);
                                         }
-                                        // Handle potential_match notifications
-                                        if (notif.type === 'potential_match') {
+                                        // Navigate to My Reports for all notifications
+                                        if (notif.type === 'potential_match' || notif.itemId) {
                                             setIsOpen(false);
-                                            navigate('/matches', {
-                                                state: {
-                                                    matchedItems: notif.matchedItems || [],
-                                                    itemId: notif.itemId
-                                                }
-                                            });
+                                            navigate('/my-reports');
                                         }
                                     }}
                                 >
@@ -133,11 +128,11 @@ export default function NotificationBell() {
                                                 onClick={async () => {
                                                     await handleMarkRead(notif.id);
                                                     setIsOpen(false);
-                                                    window.location.href = '/activity';
+                                                    navigate('/my-reports');
                                                 }}
                                                 className="flex-1 px-3 py-1.5 bg-indigo-600 text-white text-[10px] font-bold rounded-lg hover:bg-indigo-700 transition-colors shadow-sm"
                                             >
-                                                Review & Approve
+                                                Review
                                             </button>
                                             <button
                                                 onClick={() => handleMarkRead(notif.id)}
