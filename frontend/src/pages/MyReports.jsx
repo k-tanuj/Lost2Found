@@ -90,8 +90,9 @@ export default function MyReports() {
                     /* Items List */
                     <div className="space-y-6">
                         {items.map((item, index) => {
-                            const userStatus = getUserFacingStatus(item.status);
+                            const userStatus = getUserFacingStatus(item.status, item);
                             const action = getUserAction(item.status, currentUser.uid, item.userId);
+                            const isVerified = item.status === 'VERIFIED';
 
                             return (
                                 <motion.div
@@ -146,6 +147,28 @@ export default function MyReports() {
                                                     <p className="text-sm text-slate-700 dark:text-slate-300">
                                                         Review their claim and decide if this item belongs to them.
                                                     </p>
+                                                ) : isVerified ? (
+                                                    <div className="space-y-2">
+                                                        <p className="text-sm text-slate-700 dark:text-slate-300">
+                                                            Arrange pickup/handoff with the other party.
+                                                        </p>
+                                                        {item.claimantEmail && (
+                                                            <div className="mt-3 p-3 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg border border-indigo-200 dark:border-indigo-800">
+                                                                <p className="text-xs font-bold text-indigo-700 dark:text-indigo-400 mb-1">Contact Information:</p>
+                                                                <a href={`mailto:${item.claimantEmail}`} className="text-sm text-indigo-600 dark:text-indigo-400 hover:underline font-medium">
+                                                                    {item.claimantEmail}
+                                                                </a>
+                                                            </div>
+                                                        )}
+                                                        {item.userEmail && item.userId !== currentUser.uid && (
+                                                            <div className="mt-3 p-3 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg border border-indigo-200 dark:border-indigo-800">
+                                                                <p className="text-xs font-bold text-indigo-700 dark:text-indigo-400 mb-1">Owner's Contact:</p>
+                                                                <a href={`mailto:${item.userEmail}`} className="text-sm text-indigo-600 dark:text-indigo-400 hover:underline font-medium">
+                                                                    {item.userEmail}
+                                                                </a>
+                                                            </div>
+                                                        )}
+                                                    </div>
                                                 ) : (
                                                     <p className="text-sm text-slate-700 dark:text-slate-300">
                                                         Nothing! We'll notify you if we find a match.
