@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { MapPin, Calendar, ArrowRight } from 'lucide-react';
+import { ITEM_STATUS } from '../constants/itemStatus';
 
 export default function ItemCard({ item, onClick }) {
     const getEmbedUrl = (url) => {
@@ -25,7 +26,7 @@ export default function ItemCard({ item, onClick }) {
             whileHover={{ y: -4, scale: 1.01 }}
             whileTap={{ scale: 0.98 }}
             onClick={() => onClick && onClick(item)}
-            className={`bg-white dark:bg-slate-900 p-4 rounded-2xl shadow-md hover:shadow-xl dark:shadow-none border border-slate-200 dark:border-slate-800 flex items-center space-x-5 transition-all duration-300 cursor-pointer group relative overflow-hidden ${item.status === 'returned' ? 'border-emerald-500/50 dark:border-emerald-500/50 shadow-emerald-500/10' : ''}`}
+            className={`bg-white dark:bg-slate-900 p-4 rounded-2xl shadow-md hover:shadow-xl dark:shadow-none border border-slate-200 dark:border-slate-800 flex items-center space-x-5 transition-all duration-300 cursor-pointer group relative overflow-hidden ${item.status === ITEM_STATUS.RESOLVED ? 'border-emerald-500/50 dark:border-emerald-500/50 shadow-emerald-500/10' : ''}`}
         >
             {/* Background Glow Effect */}
             <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/5 dark:bg-indigo-400/5 rounded-full blur-3xl -mr-16 -mt-16 group-hover:bg-indigo-500/10 transition-colors"></div>
@@ -37,14 +38,14 @@ export default function ItemCard({ item, onClick }) {
                 ) : (
                     <div className="text-3xl group-hover:scale-110 transition-transform grayscale dark:invert">📦</div>
                 )}
-                <div className={`absolute top-1 left-1 px-1.5 py-0.5 rounded-md text-[8px] font-black uppercase tracking-tighter z-20 shadow-sm ${item.status === 'returned' ? 'bg-indigo-500 text-white' :
-                    item.status === 'secured' ? 'bg-blue-500 text-white' :
-                        item.status === 'CLAIMED' ? 'bg-amber-500 text-white' :
+                <div className={`absolute top-1 left-1 px-1.5 py-0.5 rounded-md text-[8px] font-black uppercase tracking-tighter z-20 shadow-sm ${item.status === ITEM_STATUS.RESOLVED ? 'bg-indigo-500 text-white' :
+                    item.status === ITEM_STATUS.SECURED ? 'bg-blue-500 text-white' :
+                        item.status === ITEM_STATUS.CLAIM_REQUESTED ? 'bg-amber-500 text-white' :
                             item.type === 'lost' ? 'bg-red-500 text-white' : 'bg-emerald-500 text-white'
                     }`}>
-                    {item.status === 'returned' ? 'RETURNED' :
-                        item.status === 'secured' ? 'SECURED' :
-                            item.status === 'CLAIMED' ? 'PENDING' :
+                    {item.status === ITEM_STATUS.RESOLVED ? 'RETURNED' :
+                        item.status === ITEM_STATUS.SECURED ? 'SECURED' :
+                            item.status === ITEM_STATUS.CLAIM_REQUESTED ? 'PENDING' :
                                 item.type}
                 </div>
             </div>

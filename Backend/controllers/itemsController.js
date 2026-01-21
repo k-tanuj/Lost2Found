@@ -5,6 +5,7 @@ const stream = require('stream');
 const axios = require('axios');
 const QRCode = require('qrcode');
 const { sendEmail } = require('../utils/email');
+const { ITEM_STATUS, ALLOWED_TRANSITIONS } = require('../constants/itemStatus');
 
 exports.getItems = async (req, res) => {
     try {
@@ -109,6 +110,7 @@ exports.createItem = async (req, res) => {
 
         const itemData = {
             type: type || req.body.type || 'lost',
+            status: ITEM_STATUS.REPORTED, // FSM: Initial state
             ...req.body,
             imageUrl: imageUrl,
             date: new Date().toISOString(),
@@ -195,13 +197,15 @@ exports.claimItem = async (req, res) => {
             }
 
             // 2. Prevent multiple claims if already processed
-            if (itemData.status && !['active', 'lost', 'found', 'reported'].includes(itemData.status.toLowerCase())) {
-                throw new Error(`Item is already ${itemData.status}`);
+            // 2. FSM: Check if transition to CLAIM_REQUESTED is allowed
+            const currentStatus = itemData.status || ITEM_STATUS.REPORTED; // Default to REPORTED if undefined
+            if (!ALLOWED_TRANSITIONS[currentStatus]?.includes(ITEM_STATUS.CLAIM_REQUESTED)) {
+                throw new Error(`Item cannot be claimed from current status: ${currentStatus}`);
             }
 
             // 3. Update status to CLAIMED
             t.update(itemRef, {
-                status: 'CLAIMED',
+                status: ITEM_STATUS.CLAIM_REQUESTED,
                 claimantId: claimantId,
                 claimedAt: new Date().toISOString()
             });
@@ -284,15 +288,23 @@ exports.updateItemStatus = async (req, res) => {
         }
 
         const itemData = itemDoc.data();
+        const currentStatus = itemData.status || ITEM_STATUS.REPORTED;
+
+        // FSM: Validate Transition
+        if (!ALLOWED_TRANSITIONS[currentStatus]?.includes(status)) {
+            return res.status(400).json({
+                error: `Invalid status transition from ${currentStatus} to ${status}. Allowed: ${ALLOWED_TRANSITIONS[currentStatus]?.join(', ')}`
+            });
+        }
 
         await itemRef.update({
             status: status,
             updatedAt: new Date().toISOString(),
-            resolvedAt: (status === 'returned' || status === 'secured') ? new Date().toISOString() : null
+            resolvedAt: (status === ITEM_STATUS.RESOLVED) ? new Date().toISOString() : null
         });
 
-        // Notify Claimant via Email if item is returned/secured
-        if ((status === 'returned' || status === 'secured') && itemData.claimantId) {
+        // Notify Claimant via Email if item is resolved
+        if ((status === ITEM_STATUS.RESOLVED) && itemData.claimantId) {
             try {
                 const claimantUser = await adminAuth.getUser(itemData.claimantId);
                 const claimantEmail = claimantUser.email;

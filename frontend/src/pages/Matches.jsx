@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getMatches, getItemById, createNotification, claimItem } from '../services/api';
+import { ITEM_STATUS } from '../constants/itemStatus';
 import Navbar from '../components/Navbar';
 import { MapPin, Calendar, Info, X, CheckCircle, ExternalLink, Shield, AlertCircle } from 'lucide-react';
 import { useNotification } from '../context/NotificationContext';
@@ -68,11 +69,18 @@ export default function Matches() {
         try {
             await claimItem(matchId);
             notification.success(`Claim request sent! The owner has been notified.`);
+            // Optimistically update local state to reflect change? Or refetch. 
+            // For now, let's just show success. 
         } catch (error) {
             console.error("Claim failed", error);
             const errorMsg = error.response?.data?.error || "Failed to send claim request.";
             notification.error(errorMsg);
         }
+    };
+
+    const isClaimable = (status) => {
+        // If no status, assume claimable (legacy). If REPORTED or MATCH_FOUND, claimable.
+        return !status || status === ITEM_STATUS.REPORTED || status === ITEM_STATUS.MATCH_FOUND || status === 'lost' || status === 'found';
     };
 
     return (
@@ -175,15 +183,15 @@ export default function Matches() {
                                         </button>
                                         <button
                                             onClick={() => handleClaim(match.id)}
-                                            disabled={match.status && match.status !== 'lost' && match.status !== 'found'}
+                                            disabled={!isClaimable(match.status)}
                                             className={`py-2.5 rounded-xl text-white font-semibold text-sm transition-all flex items-center justify-center gap-2
-                                                ${(match.status && match.status !== 'lost' && match.status !== 'found')
+                                                ${!isClaimable(match.status)
                                                     ? 'bg-slate-300 cursor-not-allowed'
                                                     : 'bg-indigo-600 hover:bg-indigo-700 shadow-lg shadow-indigo-200 active:scale-95'
                                                 }`}
                                         >
-                                            {(match.status && match.status !== 'lost' && match.status !== 'found')
-                                                ? (match.status === 'CLAIMED' ? 'Pending' : 'Resolved')
+                                            {!isClaimable(match.status)
+                                                ? (match.status === ITEM_STATUS.CLAIM_REQUESTED ? 'Pending' : 'Resolved')
                                                 : 'Claim'}
                                             <ExternalLink className="w-4 h-4" />
                                         </button>
@@ -273,20 +281,20 @@ export default function Matches() {
 
                     <button
                         onClick={() => {
-                            if (!selectedMatch.status || selectedMatch.status === 'lost' || selectedMatch.status === 'found') {
+                            if (isClaimable(selectedMatch.status)) {
                                 handleClaim(selectedMatch.id);
                                 setSelectedMatch(null);
                             }
                         }}
-                        disabled={selectedMatch.status && selectedMatch.status !== 'lost' && selectedMatch.status !== 'found'}
+                        disabled={!isClaimable(selectedMatch.status)}
                         className={`w-full py-4 font-bold rounded-2xl shadow-xl transition-all flex items-center justify-center gap-2
-                                    ${(selectedMatch.status && selectedMatch.status !== 'lost' && selectedMatch.status !== 'found')
+                                    ${!isClaimable(selectedMatch.status)
                                 ? 'bg-slate-300 text-slate-500 cursor-not-allowed shadow-none'
                                 : 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-indigo-200 active:scale-95'
                             }`}
                     >
-                        {(selectedMatch.status && selectedMatch.status !== 'lost' && selectedMatch.status !== 'found')
-                            ? <><AlertCircle className="w-5 h-5" /> Item {selectedMatch.status === 'CLAIMED' ? 'Pending Approval' : 'Already Resolved'}</>
+                        {!isClaimable(selectedMatch.status)
+                            ? <><AlertCircle className="w-5 h-5" /> Item {selectedMatch.status === ITEM_STATUS.CLAIM_REQUESTED ? 'Pending Approval' : 'Already Resolved'}</>
                             : <><CheckCircle className="w-5 h-5" /> Claim This Item</>}
                     </button>
                 </div>

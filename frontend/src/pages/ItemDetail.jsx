@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getItemById } from '../services/api';
+import { ITEM_STATUS } from '../constants/itemStatus';
 import Navbar from '../components/Navbar';
 import { Package, MapPin, Calendar, QrCode, ShieldCheck, CheckCircle, ArrowLeft } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -79,10 +80,10 @@ export default function ItemDetail() {
                         {/* Status Badge */}
                         <div className="flex justify-center -mt-16 mb-8 relative z-20">
                             <div className={`px-6 py-3 rounded-2xl shadow-xl font-black uppercase tracking-widest text-sm flex items-center gap-3
-                                ${item.status === 'returned' ? 'bg-emerald-500 text-white' :
-                                    item.status === 'secured' ? 'bg-blue-500 text-white' :
+                                ${item.status === ITEM_STATUS.RESOLVED ? 'bg-emerald-500 text-white' :
+                                    item.status === ITEM_STATUS.SECURED ? 'bg-blue-500 text-white' :
                                         'bg-white text-slate-800 dark:bg-slate-800 dark:text-white border border-slate-200 dark:border-slate-700'}`}>
-                                {item.status === 'returned' && <CheckCircle className="w-5 h-5" />}
+                                {item.status === ITEM_STATUS.RESOLVED && <CheckCircle className="w-5 h-5" />}
                                 {item.status || 'Active'}
                             </div>
                         </div>
@@ -124,7 +125,7 @@ export default function ItemDetail() {
                             <p className="text-xs text-slate-400 leading-relaxed max-w-xs mx-auto mb-6">
                                 This is a verified record from the Lost2Found network. Use this page to verify ownership during physical handover.
                             </p>
-                            {item.status ? (
+                            {(item.status === ITEM_STATUS.RESOLVED || item.status === ITEM_STATUS.SECURED) ? (
                                 <div className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 rounded-lg text-xs font-bold">
                                     <ShieldCheck className="w-4 h-4" /> Secure Chain of Custody Verified
                                 </div>

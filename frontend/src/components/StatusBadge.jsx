@@ -1,22 +1,28 @@
 
 import { CheckCircle, Shield, AlertCircle, Clock } from 'lucide-react';
+import { ITEM_STATUS } from '../constants/itemStatus';
 
 export default function StatusBadge({ status }) {
     const getStatusConfig = (status) => {
-        switch (status?.toLowerCase()) {
-            case 'returned':
+        // Handle legacy lowercase or new constant
+        const normalizedStatus = status?.toUpperCase();
+        switch (normalizedStatus) {
+            case ITEM_STATUS.RESOLVED:
+            case 'RETURNED': // Legacy support
                 return {
                     icon: CheckCircle,
                     text: 'Returned',
                     className: 'bg-emerald-100 text-emerald-700 border-emerald-200'
                 };
-            case 'secured':
+            case ITEM_STATUS.SECURED:
+            case 'SECURED': // Legacy support
                 return {
                     icon: Shield,
                     text: 'Secured at Office',
                     className: 'bg-blue-100 text-blue-700 border-blue-200'
                 };
-            case 'claimed':
+            case ITEM_STATUS.CLAIM_REQUESTED:
+            case 'CLAIMED': // Legacy support
                 return {
                     icon: AlertCircle,
                     text: 'Claim Pending',

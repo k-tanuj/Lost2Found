@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { getUserItems } from '../services/api';
+import { ITEM_STATUS } from '../constants/itemStatus';
 import Navbar from '../components/Navbar';
 import {
     ChevronLeft, Moon, Sun, LogOut, Package,
@@ -25,7 +26,7 @@ export default function Profile() {
                     setStats({
                         lost: items.filter(i => i.type === 'lost').length,
                         found: items.filter(i => i.type === 'found').length,
-                        resolved: items.filter(i => i.status === 'returned' || i.status === 'secured').length
+                        resolved: items.filter(i => i.status === ITEM_STATUS.RESOLVED || i.status === ITEM_STATUS.SECURED).length
                     });
                 } catch (error) {
                     console.error("Failed to fetch profile stats");

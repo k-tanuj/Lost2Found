@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { getUserItems, updateItemStatus } from '../services/api';
+import { ITEM_STATUS } from '../constants/itemStatus';
 import Navbar from '../components/Navbar';
 import {
     Package, CheckCircle, Shield, Clock, AlertCircle,
@@ -46,12 +47,12 @@ export default function Activity() {
     const getStateHint = (item, stepStatus) => {
         if (stepStatus === 'Reported') return "Live in AI Network";
         if (stepStatus === 'Claimed') {
-            if (item.status === 'REPORTED') return "Waiting for matching";
-            if (item.status === 'CLAIMED') return "REVIEW REQUIRED";
+            if (item.status === ITEM_STATUS.REPORTED) return "Waiting for matching";
+            if (item.status === ITEM_STATUS.CLAIM_REQUESTED) return "REVIEW REQUIRED";
             return "In Verification";
         }
         if (stepStatus === 'Resolved') {
-            if (item.status === 'returned' || item.status === 'secured') return "Safe & Sound";
+            if (item.status === ITEM_STATUS.RESOLVED || item.status === ITEM_STATUS.SECURED) return "Safe & Sound";
             return "Final Step";
         }
         return null;
@@ -185,14 +186,14 @@ export default function Activity() {
                                                     <TimelineStep label="Report Broadcast" completed={true} hint={getStateHint(item, 'Reported')} />
                                                     <TimelineStep
                                                         label="Claim Processing"
-                                                        active={item.status === 'REPORTED'}
-                                                        completed={item.status !== 'REPORTED'}
+                                                        active={item.status === ITEM_STATUS.REPORTED}
+                                                        completed={item.status !== ITEM_STATUS.REPORTED}
                                                         hint={getStateHint(item, 'Claimed')}
                                                     />
                                                     <TimelineStep
                                                         label="Handover Resolved"
-                                                        active={item.status === 'CLAIMED'}
-                                                        completed={item.status === 'returned' || item.status === 'secured'}
+                                                        active={item.status === ITEM_STATUS.CLAIM_REQUESTED}
+                                                        completed={item.status === ITEM_STATUS.RESOLVED || item.status === ITEM_STATUS.SECURED}
                                                         hint={getStateHint(item, 'Resolved')}
                                                         last={true}
                                                     />
@@ -213,16 +214,16 @@ export default function Activity() {
                                                 </div>
 
                                                 <div className="pt-8">
-                                                    {item.status !== 'returned' && item.status !== 'secured' ? (
+                                                    {item.status !== ITEM_STATUS.RESOLVED && item.status !== ITEM_STATUS.SECURED ? (
                                                         <div className="space-y-3">
                                                             <button
-                                                                onClick={() => handleStatusUpdate(item.id, 'returned')}
+                                                                onClick={() => handleStatusUpdate(item.id, ITEM_STATUS.RESOLVED)}
                                                                 className="w-full flex items-center justify-between px-6 py-4 bg-emerald-600 text-white rounded-2xl font-black text-sm hover:bg-emerald-700 transition-all hover:translate-x-1 shadow-lg shadow-emerald-600/20"
                                                             >
                                                                 Confirm Return <ArrowRight className="w-4 h-4" />
                                                             </button>
                                                             <button
-                                                                onClick={() => handleStatusUpdate(item.id, 'secured')}
+                                                                onClick={() => handleStatusUpdate(item.id, ITEM_STATUS.SECURED)}
                                                                 className="w-full py-4 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 rounded-2xl font-black text-sm hover:bg-slate-200 dark:hover:bg-slate-700 transition-all"
                                                             >
                                                                 Secure at Security Office
