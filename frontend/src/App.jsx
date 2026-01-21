@@ -4,7 +4,6 @@ import Login from './pages/Login';
 import Homepage from './pages/Homepage';
 import ReportWizard from './pages/ReportWizard';
 import Browse from './pages/Browse';
-import Matches from './pages/Matches';
 import MyReports from './pages/MyReports';
 import Profile from './pages/Profile';
 import ItemDetail from './pages/ItemDetail';
@@ -38,14 +37,6 @@ const AnimatedRoutes = () => {
           element={
             <PrivateRoute>
               <PageWrapper><Browse /></PageWrapper>
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/matches"
-          element={
-            <PrivateRoute>
-              <PageWrapper><Matches /></PageWrapper>
             </PrivateRoute>
           }
         />

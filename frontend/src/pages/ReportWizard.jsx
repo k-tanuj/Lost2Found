@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { reportItem } from '../services/api';
 import { useAuth } from '../context/AuthContext';
@@ -25,6 +25,16 @@ export default function ReportWizard() {
     });
 
     const totalSteps = type === 'found' ? 3 : 4;
+
+    // Auto-redirect after completion
+    useEffect(() => {
+        if (step === totalSteps + 1) {
+            const timer = setTimeout(() => {
+                navigate('/home');
+            }, 5000);
+            return () => clearTimeout(timer);
+        }
+    }, [step, totalSteps, navigate]);
 
     const handleNext = () => {
         if (step < totalSteps) setStep(step + 1);
@@ -69,8 +79,7 @@ export default function ReportWizard() {
             setStep(totalSteps + 1);
         } catch (error) {
             console.error("Error reporting item:", error);
-            const errMsg = error.response?.data?.error || error.message;
-            notification.error(`Failed to report: ${errMsg}`);
+            notification.error('Something went wrong. Please try again in a moment.');
         } finally {
             setLoading(false);
         }
@@ -298,22 +307,19 @@ export default function ReportWizard() {
                                     <CheckCircle className="w-12 h-12 text-white" />
                                 </motion.div>
 
-                                <h2 className="text-3xl font-black text-slate-900 dark:text-white">
+                                <h2 className="text-3xl font-black text-slate-900 dark:text-white mb-4">
                                     {type === 'lost' ? "Thanks. We're looking for your item." : "Thanks for helping."}
                                 </h2>
 
                                 <p className="text-lg text-slate-600 dark:text-slate-400 max-w-md mx-auto leading-relaxed">
                                     {type === 'lost'
                                         ? "You don't need to do anything right now. We'll notify you if we find a possible match."
-                                        : "If someone claims this item, we'll notify you."}
+                                        : "If someone thinks this is theirs, we'll notify you."}
                                 </p>
 
-                                <button
-                                    onClick={() => navigate('/my-reports')}
-                                    className="mt-8 px-8 py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-2xl transition-all"
-                                >
-                                    View my reports
-                                </button>
+                                <p className="text-sm text-slate-400 dark:text-slate-500 mt-8">
+                                    Returning to home in a moment...
+                                </p>
                             </div>
                         )}
                     </motion.div>

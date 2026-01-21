@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import Navbar from '../components/Navbar';
 import { getItems, claimItem } from '../services/api';
 import { useNotification } from '../context/NotificationContext';
-import { Search as SearchIcon, Package, ArrowRight } from 'lucide-react';
+import { Search as SearchIcon, Package } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function Browse() {
@@ -15,7 +15,6 @@ export default function Browse() {
     const [items, setItems] = useState([]);
     const [filteredItems, setFilteredItems] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [activeTab, setActiveTab] = useState('found'); // found or lost
     const [claimingId, setClaimingId] = useState(null);
     const [claimProof, setClaimProof] = useState('');
 
@@ -23,10 +22,10 @@ export default function Browse() {
         const fetchAllItems = async () => {
             try {
                 const data = await getItems('all');
-                // Filter out user's own items
-                const otherItems = data.filter(item => item.userId !== currentUser?.uid);
-                setItems(otherItems);
-                setFilteredItems(otherItems.filter(item => item.type === 'found'));
+                // Filter out user's own items and show only FOUND items
+                const foundItems = data.filter(item => item.userId !== currentUser?.uid && item.type === 'found');
+                setItems(foundItems);
+                setFilteredItems(foundItems);
             } catch (error) {
                 console.error("Failed to fetch items", error);
             } finally {
@@ -37,37 +36,36 @@ export default function Browse() {
     }, [currentUser]);
 
     useEffect(() => {
-        let result = items.filter(item => item.type === activeTab);
-
         if (query) {
             const lowerQuery = query.toLowerCase();
-            result = result.filter(item =>
+            const result = items.filter(item =>
                 item.title?.toLowerCase().includes(lowerQuery) ||
                 item.description?.toLowerCase().includes(lowerQuery) ||
                 item.locationText?.toLowerCase().includes(lowerQuery)
             );
+            setFilteredItems(result);
+        } else {
+            setFilteredItems(items);
         }
-
-        setFilteredItems(result);
-    }, [query, activeTab, items]);
+    }, [query, items]);
 
     const handleClaim = async (itemId) => {
         if (!claimProof.trim()) {
-            notification.error('Please provide proof explaining why this is yours');
+            notification.error('Please tell us why this item is yours');
             return;
         }
 
         try {
             await claimItem(itemId, '', claimProof); // Pass empty message, proof as third param
-            notification.success("Claim submitted! The owner will review it.");
+            notification.success("Submitted! The owner will review your request.");
             setClaimingId(null);
             setClaimProof('');
             // Refresh items
             const data = await getItems('all');
-            const otherItems = data.filter(item => item.userId !== currentUser?.uid);
-            setItems(otherItems);
+            const foundItems = data.filter(item => item.userId !== currentUser?.uid && item.type === 'found');
+            setItems(foundItems);
         } catch (error) {
-            notification.error(error.response?.data?.error || 'Failed to claim item');
+            notification.error('Something went wrong. Please try again in a moment.');
         }
     };
 
@@ -79,39 +77,11 @@ export default function Browse() {
                 {/* Header */}
                 <div className="mb-12">
                     <h1 className="text-4xl font-black text-slate-900 dark:text-white mb-2">
-                        Browse Items
+                        Looking for your lost item?
                     </h1>
                     <p className="text-slate-500 dark:text-slate-400 font-medium">
-                        Find your lost item or help return found items
+                        Check if someone found it
                     </p>
-                </div>
-
-                {/* Tabs */}
-                <div className="flex gap-4 mb-8">
-                    <button
-                        onClick={() => setActiveTab('found')}
-                        className={`flex-1 py-4 rounded-2xl font-bold text-lg transition-all ${activeTab === 'found'
-                            ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-500/30'
-                            : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-800'
-                            }`}
-                    >
-                        🟢 Found Items
-                        <span className="ml-2 text-sm opacity-75">
-                            ({items.filter(i => i.type === 'found').length})
-                        </span>
-                    </button>
-                    <button
-                        onClick={() => setActiveTab('lost')}
-                        className={`flex-1 py-4 rounded-2xl font-bold text-lg transition-all ${activeTab === 'lost'
-                            ? 'bg-red-600 text-white shadow-lg shadow-red-500/30'
-                            : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-800'
-                            }`}
-                    >
-                        🔴 Lost Items
-                        <span className="ml-2 text-sm opacity-75">
-                            ({items.filter(i => i.type === 'lost').length})
-                        </span>
-                    </button>
                 </div>
 
                 {/* Search Bar */}
@@ -121,7 +91,7 @@ export default function Browse() {
                         type="text"
                         value={query}
                         onChange={(e) => setQuery(e.target.value)}
-                        placeholder="Search by name or location..."
+                        placeholder="Search for your item..."
                         className="w-full pl-12 pr-4 py-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                     />
                 </div>
@@ -163,23 +133,13 @@ export default function Browse() {
                                             📍 {item.locationText}
                                         </p>
 
-                                        {/* Claim Button (only for found items) */}
-                                        {activeTab === 'found' && claimingId !== item.id && (
+                                        {/* Claim Button */}
+                                        {claimingId !== item.id && (
                                             <button
                                                 onClick={() => setClaimingId(item.id)}
                                                 className="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-2xl transition-all flex items-center justify-center gap-2"
                                             >
                                                 ✅ This is mine!
-                                            </button>
-                                        )}
-
-                                        {/* View Details (for lost items) */}
-                                        {activeTab === 'lost' && (
-                                            <button
-                                                onClick={() => navigate(`/item/${item.id}`)}
-                                                className="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-2xl transition-all flex items-center justify-center gap-2"
-                                            >
-                                                View Details <ArrowRight className="w-5 h-5" />
                                             </button>
                                         )}
 
@@ -191,13 +151,13 @@ export default function Browse() {
                                                 className="mt-4 space-y-3"
                                             >
                                                 <p className="text-sm font-bold text-slate-700 dark:text-slate-300">
-                                                    Prove this is yours:
+                                                    Tell us why this is yours:
                                                 </p>
                                                 <textarea
                                                     value={claimProof}
                                                     onChange={(e) => setClaimProof(e.target.value)}
-                                                    placeholder="I lost my blue wallet at the library yesterday. It has my student ID and credit card inside..."
-                                                    className="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 min-h-[100px]"
+                                                    placeholder="Example: I lost my blue wallet at the library yesterday. It has my student ID inside..."
+                                                    className="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 min-h-[80px]"
                                                 />
                                                 <div className="flex gap-2">
                                                     <button
@@ -214,7 +174,7 @@ export default function Browse() {
                                                         disabled={!claimProof.trim()}
                                                         className="flex-1 py-2 bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-300 text-white font-bold rounded-xl transition-all"
                                                     >
-                                                        Submit Claim
+                                                        Submit
                                                     </button>
                                                 </div>
                                             </motion.div>
@@ -230,10 +190,10 @@ export default function Browse() {
                             <SearchIcon className="w-10 h-10 text-slate-400" />
                         </div>
                         <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">
-                            No {activeTab} items found
+                            No items found
                         </h3>
                         <p className="text-slate-500 dark:text-slate-400">
-                            {query ? 'Try adjusting your search' : `No ${activeTab} items reported yet`}
+                            {query ? 'Try a different search' : 'No found items reported yet'}
                         </p>
                     </div>
                 )}

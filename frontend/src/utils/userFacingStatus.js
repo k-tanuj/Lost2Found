@@ -2,21 +2,22 @@
  * Maps internal system statuses to user-friendly messages.
  * This ensures users never see technical terms like "CLAIM_REQUESTED" or "VERIFIED".
  * 
+ * CRITICAL: These messages are designed for stressed, non-technical users.
+ * They must be calm, reassuring, and use everyday language.
+ * 
  * @param {string} systemStatus - The internal status from the backend
  * @param {object} itemData - Optional item data for context (e.g., claimantEmail)
  * @returns {string} - A plain-English message for the user
  */
 export const getUserFacingStatus = (systemStatus, itemData = {}) => {
     const statusMap = {
-        'REPORTED': "We're still looking for your item.",
-        'MATCH_FOUND': "We may have found your item. Checking now...",
-        'CLAIM_REQUESTED': "Someone thinks this belongs to them. Please review their request.",
-        'VERIFIED': itemData.claimantEmail
-            ? `Match confirmed! Contact them at: ${itemData.claimantEmail}`
-            : "Ownership confirmed. You can collect your item.",
-        'RESOLVED': "This case is closed. Glad we could help!",
-        'REJECTED': "The claim was not a match. We're still looking.",
-        'SECURED': "This item is safely stored at the security office."
+        'REPORTED': "We're looking for your item.",
+        'MATCH_FOUND': "We may have found your item.",
+        'CLAIM_REQUESTED': "Someone thinks this might be theirs.",
+        'VERIFIED': "Great news! We found the owner.",
+        'RESOLVED': "All done. Glad we could help!",
+        'REJECTED': "That wasn't a match. We're still looking.",
+        'SECURED': "This item is safely stored."
     };
 
     return statusMap[systemStatus] || "We're working on this.";
@@ -35,7 +36,7 @@ export const getUserAction = (systemStatus, userId, itemOwnerId) => {
     if (systemStatus === 'CLAIM_REQUESTED' && userId === itemOwnerId) {
         return {
             needsAction: true,
-            actionText: "Review request"
+            actionText: "Review this"
         };
     }
 

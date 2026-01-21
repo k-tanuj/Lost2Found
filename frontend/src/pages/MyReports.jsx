@@ -33,8 +33,9 @@ export default function MyReports() {
         return (
             <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
                 <Navbar />
-                <div className="flex items-center justify-center py-32">
+                <div className="flex flex-col items-center justify-center py-32 gap-4">
                     <div className="w-16 h-16 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
+                    <p className="text-slate-600 dark:text-slate-400 font-medium">Please wait...</p>
                 </div>
             </div>
         );
@@ -66,10 +67,10 @@ export default function MyReports() {
                             <Package className="w-10 h-10 text-slate-400" />
                         </div>
                         <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">
-                            You haven't reported anything yet
+                            Nothing here yet
                         </h3>
                         <p className="text-slate-500 dark:text-slate-400 mb-8">
-                            Report a lost or found item to get started
+                            Report something to get started
                         </p>
                         <div className="flex flex-col sm:flex-row gap-4 justify-center">
                             <button
@@ -139,30 +140,30 @@ export default function MyReports() {
                                             </p>
 
                                             {/* What you need to do */}
-                                            <div className="mb-4 p-4 bg-slate-50 dark:bg-slate-800 rounded-xl">
-                                                <p className="text-sm font-bold text-slate-600 dark:text-slate-400 mb-2">
+                                            <div className="mb-4 p-4 bg-indigo-50 dark:bg-indigo-900/20 rounded-xl border-2 border-indigo-200 dark:border-indigo-800">
+                                                <p className="text-sm font-bold text-indigo-900 dark:text-indigo-300 mb-2">
                                                     👉 What you need to do:
                                                 </p>
                                                 {action.needsAction ? (
                                                     <p className="text-sm text-slate-700 dark:text-slate-300">
-                                                        Review their claim and decide if this item belongs to them.
+                                                        Review their information and decide if this item belongs to them.
                                                     </p>
                                                 ) : isVerified ? (
                                                     <div className="space-y-2">
                                                         <p className="text-sm text-slate-700 dark:text-slate-300">
-                                                            Arrange pickup/handoff with the other party.
+                                                            Arrange pickup or handoff with the other person.
                                                         </p>
                                                         {item.claimantEmail && (
-                                                            <div className="mt-3 p-3 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg border border-indigo-200 dark:border-indigo-800">
-                                                                <p className="text-xs font-bold text-indigo-700 dark:text-indigo-400 mb-1">Contact Information:</p>
+                                                            <div className="mt-3 p-3 bg-white dark:bg-slate-800 rounded-lg">
+                                                                <p className="text-xs font-bold text-slate-600 dark:text-slate-400 mb-1">Contact them:</p>
                                                                 <a href={`mailto:${item.claimantEmail}`} className="text-sm text-indigo-600 dark:text-indigo-400 hover:underline font-medium">
                                                                     {item.claimantEmail}
                                                                 </a>
                                                             </div>
                                                         )}
                                                         {item.userEmail && item.userId !== currentUser.uid && (
-                                                            <div className="mt-3 p-3 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg border border-indigo-200 dark:border-indigo-800">
-                                                                <p className="text-xs font-bold text-indigo-700 dark:text-indigo-400 mb-1">Owner's Contact:</p>
+                                                            <div className="mt-3 p-3 bg-white dark:bg-slate-800 rounded-lg">
+                                                                <p className="text-xs font-bold text-slate-600 dark:text-slate-400 mb-1">Contact them:</p>
                                                                 <a href={`mailto:${item.userEmail}`} className="text-sm text-indigo-600 dark:text-indigo-400 hover:underline font-medium">
                                                                     {item.userEmail}
                                                                 </a>
@@ -171,25 +172,18 @@ export default function MyReports() {
                                                     </div>
                                                 ) : (
                                                     <p className="text-sm text-slate-700 dark:text-slate-300">
-                                                        Nothing! We'll notify you if we find a match.
+                                                        Nothing! Just wait. We'll notify you if we find something.
                                                     </p>
                                                 )}
                                             </div>
 
                                             {/* Action Button (Max ONE, or none) */}
-                                            {action.needsAction ? (
+                                            {action.needsAction && (
                                                 <button
                                                     onClick={() => navigate(`/item/${item.id}`)}
                                                     className="inline-flex items-center gap-2 px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-2xl transition-all"
                                                 >
                                                     {action.actionText} <ArrowRight className="w-5 h-5" />
-                                                </button>
-                                            ) : (
-                                                <button
-                                                    onClick={() => navigate('/browse')}
-                                                    className="inline-flex items-center gap-2 px-6 py-3 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 font-bold rounded-2xl transition-all"
-                                                >
-                                                    Browse Similar Items <ArrowRight className="w-5 h-5" />
                                                 </button>
                                             )}
                                         </div>

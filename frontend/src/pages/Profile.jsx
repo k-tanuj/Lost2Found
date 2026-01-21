@@ -46,7 +46,7 @@ export default function Profile() {
             navigate('/');
         } catch (error) {
             console.error("Failed to logout", error);
-            notification.error("Failed to log out. Please try again.");
+            notification.error("Something went wrong. Please try again in a moment.");
         }
     };
 
@@ -142,6 +142,35 @@ export default function Profile() {
                             </motion.div>
                         ))}
                     </div>
+
+                    {/* Navigation Hub */}
+                    <motion.div variants={itemVariants} className="space-y-4">
+                        <h2 className="text-xs font-black text-slate-400 uppercase tracking-widest ml-1">Quick Access</h2>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <button
+                                onClick={() => navigate('/my-reports')}
+                                className="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-lg hover:shadow-xl transition-all group text-left"
+                            >
+                                <div className="w-12 h-12 rounded-2xl bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 flex items-center justify-center mb-4 transition-transform group-hover:scale-110">
+                                    <Package className="w-6 h-6" />
+                                </div>
+                                <h3 className="font-bold text-slate-900 dark:text-white mb-1">My Reports</h3>
+                                <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">View your lost and found items</p>
+                            </button>
+
+                            <button
+                                onClick={() => navigate('/browse')}
+                                className="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-lg hover:shadow-xl transition-all group text-left"
+                            >
+                                <div className="w-12 h-12 rounded-2xl bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mb-4 transition-transform group-hover:scale-110">
+                                    <CheckCircle2 className="w-6 h-6" />
+                                </div>
+                                <h3 className="font-bold text-slate-900 dark:text-white mb-1">Browse Found Items</h3>
+                                <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">Check if someone found your item</p>
+                            </button>
+                        </div>
+                    </motion.div>
 
                     {/* Settings Section */}
                     <motion.div variants={itemVariants} className="space-y-4">

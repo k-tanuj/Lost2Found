@@ -74,35 +74,12 @@ export default function Homepage() {
                     </motion.button>
                 </div>
 
-                {/* Secondary Links */}
-                <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.5 }}
-                    className="space-y-3"
-                >
-                    <button
-                        onClick={() => navigate('/my-reports')}
-                        className="block text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white font-semibold text-lg transition-colors underline decoration-2 underline-offset-4"
-                    >
-                        View my reports
-                    </button>
-                    <p className="text-slate-500 dark:text-slate-400 text-sm">
-                        or{' '}
-                        <button
-                            onClick={() => navigate('/browse')}
-                            className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 font-bold underline"
-                        >
-                            browse items to claim
-                        </button>
-                    </p>
-                </motion.div>
-
-                {/* Profile Link (Top Right) */}
+                {/* Profile Link (Top Right) - Minimal Access Point */}
                 <div className="absolute top-6 right-6">
                     <button
                         onClick={() => navigate('/profile')}
                         className="w-12 h-12 bg-white dark:bg-slate-800 rounded-full shadow-lg flex items-center justify-center overflow-hidden border-2 border-slate-200 dark:border-slate-700 hover:scale-110 transition-transform"
+                        aria-label="Profile"
                     >
                         <img
                             src="/pfp.jpg"
