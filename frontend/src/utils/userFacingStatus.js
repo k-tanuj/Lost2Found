@@ -3,14 +3,17 @@
  * This ensures users never see technical terms like "CLAIM_REQUESTED" or "VERIFIED".
  * 
  * @param {string} systemStatus - The internal status from the backend
+ * @param {object} itemData - Optional item data for context (e.g., claimantEmail)
  * @returns {string} - A plain-English message for the user
  */
-export const getUserFacingStatus = (systemStatus) => {
+export const getUserFacingStatus = (systemStatus, itemData = {}) => {
     const statusMap = {
         'REPORTED': "We're still looking for your item.",
         'MATCH_FOUND': "We may have found your item. Checking now...",
         'CLAIM_REQUESTED': "Someone thinks this belongs to them. Please review their request.",
-        'VERIFIED': "Ownership confirmed. You can collect your item.",
+        'VERIFIED': itemData.claimantEmail
+            ? `Match confirmed! Contact them at: ${itemData.claimantEmail}`
+            : "Ownership confirmed. You can collect your item.",
         'RESOLVED': "This case is closed. Glad we could help!",
         'REJECTED': "The claim was not a match. We're still looking.",
         'SECURED': "This item is safely stored at the security office."

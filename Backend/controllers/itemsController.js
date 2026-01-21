@@ -141,6 +141,71 @@ exports.createItem = async (req, res) => {
         };
 
         const docRef = await db.collection('items').add(itemData);
+        const newItemId = docRef.id;
+
+        // AUTO AI MATCHING: Find similar items and notify user
+        try {
+            const aiController = require('./aiController');
+            const candidateType = itemData.type === 'lost' ? 'found' : 'lost';
+
+            // Fetch candidates
+            const candidatesSnapshot = await db.collection('items')
+                .where('type', '==', candidateType)
+                .get();
+
+            if (!candidatesSnapshot.empty) {
+                const candidateItems = [];
+                candidatesSnapshot.forEach(doc => {
+                    candidateItems.push({ id: doc.id, ...doc.data() });
+                });
+
+                // Call AI matching
+                const axios = require('axios');
+                const AI_SERVICE_URL = process.env.AI_SERVICE_URL || 'http://127.0.0.1:8000';
+
+                const sanitizeItem = (item) => {
+                    const newItem = { ...item };
+                    if (newItem.date && typeof newItem.date.toDate === 'function') {
+                        newItem.date = newItem.date.toDate().toISOString();
+                    } else if (newItem.date instanceof Date) {
+                        newItem.date = newItem.date.toISOString();
+                    }
+                    return newItem;
+                };
+
+                const payload = {
+                    target_item: sanitizeItem({ id: newItemId, ...itemData }),
+                    candidates: candidateItems.map(sanitizeItem)
+                };
+
+                const aiResponse = await axios.post(`${AI_SERVICE_URL}/match-items`, payload);
+                const matches = aiResponse.data.filter(match => match.score >= 30); // Filter >=30%
+
+                // Create notification if matches found
+                if (matches.length > 0) {
+                    const notifRef = db.collection('notifications').doc();
+                    const notification = {
+                        type: 'potential_match',
+                        userId: req.user.uid,
+                        title: `We found ${matches.length} possible match${matches.length > 1 ? 'es' : ''}!`,
+                        message: `Your ${itemData.type} item "${itemData.title}" has ${matches.length} potential match${matches.length > 1 ? 'es' : ''}.`,
+                        itemId: newItemId,
+                        matchedItems: matches.map(m => ({
+                            id: m.item_id,
+                            score: m.score,
+                            reason: m.reason
+                        })),
+                        read: false,
+                        createdAt: new Date().toISOString()
+                    };
+                    await notifRef.set(notification);
+                    console.log(`✅ Created match notification for user ${req.user.uid}: ${matches.length} matches`);
+                }
+            }
+        } catch (aiError) {
+            // Don't fail the request if AI matching fails
+            console.error('AI Matching failed (non-critical):', aiError.message);
+        }
 
         // Sheets logging removed per user request
 
