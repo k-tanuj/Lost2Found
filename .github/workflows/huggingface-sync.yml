@@ -25,7 +25,7 @@ jobs:
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: |
-          git clone https://k-tanuj:$HF_TOKEN@huggingface.co/k-tanuj/Lost2Found hf_repo
+          git clone https://k-tanuj:$HF_TOKEN@huggingface.co/spaces/k-tanuj/Lost2Found hf_repo
 
       - name: Sync files
         run: |
