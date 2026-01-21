@@ -5,6 +5,7 @@ import Homepage from './pages/Homepage';
 import Dashboard from './pages/Dashboard';
 import Report from './pages/Report';
 import ReportWizard from './pages/ReportWizard';
+import Browse from './pages/Browse';
 import Matches from './pages/Matches';
 import Search from './pages/Search';
 import Activity from './pages/Activity';
@@ -58,6 +59,14 @@ const AnimatedRoutes = () => {
           element={
             <PrivateRoute>
               <PageWrapper><Report /></PageWrapper>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/browse"
+          element={
+            <PrivateRoute>
+              <PageWrapper><Browse /></PageWrapper>
             </PrivateRoute>
           }
         />

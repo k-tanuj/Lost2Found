@@ -7,9 +7,9 @@ export default function BottomNav() {
     const location = useLocation();
 
     const navItems = [
-        { name: 'Home', Icon: Home, path: '/dashboard' },
-        { name: 'Search', Icon: Search, path: '/search' },
-        { name: 'My Reports', Icon: FileText, path: '/my-reports' },
+        { name: 'Home', Icon: Home, path: '/home' },
+        { name: 'Browse', Icon: Search, path: '/browse' },
+        { name: 'Reports', Icon: FileText, path: '/my-reports' },
         { name: 'Profile', Icon: User, path: '/profile' },
     ];
 

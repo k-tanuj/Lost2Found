@@ -63,6 +63,7 @@ export default function Navbar() {
                                 <div className="hidden md:flex items-center gap-2">
                                     {[
                                         { name: 'Home', path: '/home' },
+                                        { name: 'Browse Items', path: '/browse' },
                                         { name: 'My Reports', path: '/my-reports' },
                                         { name: 'Profile', path: '/profile' }
                                     ].map((link) => (

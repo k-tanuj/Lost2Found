@@ -125,8 +125,8 @@ export default function MyReports() {
                                                     {item.title}
                                                 </h3>
                                                 <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase ${item.type === 'lost'
-                                                        ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
-                                                        : 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400'
+                                                    ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
+                                                    : 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400'
                                                     }`}>
                                                     {item.type}
                                                 </span>
@@ -137,6 +137,22 @@ export default function MyReports() {
                                                 {userStatus}
                                             </p>
 
+                                            {/* What you need to do */}
+                                            <div className="mb-4 p-4 bg-slate-50 dark:bg-slate-800 rounded-xl">
+                                                <p className="text-sm font-bold text-slate-600 dark:text-slate-400 mb-2">
+                                                    👉 What you need to do:
+                                                </p>
+                                                {action.needsAction ? (
+                                                    <p className="text-sm text-slate-700 dark:text-slate-300">
+                                                        Review their claim and decide if this item belongs to them.
+                                                    </p>
+                                                ) : (
+                                                    <p className="text-sm text-slate-700 dark:text-slate-300">
+                                                        Nothing! We'll notify you if we find a match.
+                                                    </p>
+                                                )}
+                                            </div>
+
                                             {/* Action Button (Max ONE, or none) */}
                                             {action.needsAction ? (
                                                 <button
@@ -146,9 +162,12 @@ export default function MyReports() {
                                                     {action.actionText} <ArrowRight className="w-5 h-5" />
                                                 </button>
                                             ) : (
-                                                <p className="text-sm text-slate-500 dark:text-slate-400 italic">
-                                                    You don't need to do anything right now.
-                                                </p>
+                                                <button
+                                                    onClick={() => navigate('/browse')}
+                                                    className="inline-flex items-center gap-2 px-6 py-3 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 font-bold rounded-2xl transition-all"
+                                                >
+                                                    Browse Similar Items <ArrowRight className="w-5 h-5" />
+                                                </button>
                                             )}
                                         </div>
                                     </div>

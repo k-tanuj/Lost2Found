@@ -74,18 +74,28 @@ export default function Homepage() {
                     </motion.button>
                 </div>
 
-                {/* Secondary Link */}
+                {/* Secondary Links */}
                 <motion.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: 0.5 }}
+                    className="space-y-3"
                 >
                     <button
                         onClick={() => navigate('/my-reports')}
-                        className="text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white font-semibold text-lg transition-colors underline decoration-2 underline-offset-4"
+                        className="block text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white font-semibold text-lg transition-colors underline decoration-2 underline-offset-4"
                     >
                         View my reports
                     </button>
+                    <p className="text-slate-500 dark:text-slate-400 text-sm">
+                        or{' '}
+                        <button
+                            onClick={() => navigate('/browse')}
+                            className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 font-bold underline"
+                        >
+                            browse items to claim
+                        </button>
+                    </p>
                 </motion.div>
 
                 {/* Profile Link (Top Right) */}
