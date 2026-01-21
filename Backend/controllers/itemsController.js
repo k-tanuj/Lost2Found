@@ -190,8 +190,8 @@ exports.claimItem = async (req, res) => {
 
     // Validation
     if (!itemId) return res.status(400).json({ error: "Item ID is required" });
-    if (!sanitizedProof || sanitizedProof.length < 20) {
-        return res.status(400).json({ error: "Proof of ownership is required (minimum 20 characters)" });
+    if (!sanitizedProof || sanitizedProof.trim().length === 0) {
+        return res.status(400).json({ error: "Proof of ownership is required" });
     }
 
     try {

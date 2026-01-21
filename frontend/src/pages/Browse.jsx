@@ -52,8 +52,8 @@ export default function Browse() {
     }, [query, activeTab, items]);
 
     const handleClaim = async (itemId) => {
-        if (!claimProof.trim() || claimProof.length < 20) {
-            notification.error('Please provide at least 20 characters explaining why this is yours');
+        if (!claimProof.trim()) {
+            notification.error('Please provide proof explaining why this is yours');
             return;
         }
 
@@ -91,8 +91,8 @@ export default function Browse() {
                     <button
                         onClick={() => setActiveTab('found')}
                         className={`flex-1 py-4 rounded-2xl font-bold text-lg transition-all ${activeTab === 'found'
-                                ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-500/30'
-                                : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-800'
+                            ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-500/30'
+                            : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-800'
                             }`}
                     >
                         🟢 Found Items
@@ -103,8 +103,8 @@ export default function Browse() {
                     <button
                         onClick={() => setActiveTab('lost')}
                         className={`flex-1 py-4 rounded-2xl font-bold text-lg transition-all ${activeTab === 'lost'
-                                ? 'bg-red-600 text-white shadow-lg shadow-red-500/30'
-                                : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-800'
+                            ? 'bg-red-600 text-white shadow-lg shadow-red-500/30'
+                            : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-800'
                             }`}
                     >
                         🔴 Lost Items
@@ -211,7 +211,7 @@ export default function Browse() {
                                                     </button>
                                                     <button
                                                         onClick={() => handleClaim(item.id)}
-                                                        disabled={claimProof.length < 20}
+                                                        disabled={!claimProof.trim()}
                                                         className="flex-1 py-2 bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-300 text-white font-bold rounded-xl transition-all"
                                                     >
                                                         Submit Claim
