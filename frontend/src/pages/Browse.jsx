@@ -58,7 +58,7 @@ export default function Browse() {
         }
 
         try {
-            await claimItem(itemId, claimProof);
+            await claimItem(itemId, '', claimProof); // Pass empty message, proof as third param
             notification.success("Claim submitted! The owner will review it.");
             setClaimingId(null);
             setClaimProof('');
