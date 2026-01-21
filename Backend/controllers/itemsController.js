@@ -5,7 +5,8 @@ const stream = require('stream');
 const axios = require('axios');
 const QRCode = require('qrcode');
 const { sendEmail } = require('../utils/email');
-const { ITEM_STATUS, ALLOWED_TRANSITIONS, canTransition } = require('../constants/itemStatus');
+const { ITEM_STATUS, canTransition, transitionItemStatus } = require('../constants/itemStatus');
+const { sanitizeText } = require('../utils/sanitize');
 
 exports.getItems = async (req, res) => {
     try {
@@ -53,11 +54,16 @@ exports.createItem = async (req, res) => {
         const { type } = req.params;
         const { title, locationText } = req.body;
 
+        // Sanitize inputs
+        const sanitizedTitle = sanitizeText(title, 100);
+        const sanitizedLocation = sanitizeText(locationText, 200);
+        const sanitizedDescription = sanitizeText(req.body.description, 500);
+
         // Validation: Required Fields
-        if (!title || !title.trim()) {
+        if (!sanitizedTitle) {
             return res.status(400).json({ error: "Title is required" });
         }
-        if (!locationText || !locationText.trim()) {
+        if (!sanitizedLocation) {
             return res.status(400).json({ error: "Location is required" });
         }
 
@@ -121,17 +127,17 @@ exports.createItem = async (req, res) => {
         const itemData = {
             type: type || req.body.type || 'lost',
             status: ITEM_STATUS.REPORTED, // FSM: Initial state
-            ...req.body,
+            title: sanitizedTitle,
+            description: sanitizedDescription,
+            locationText: sanitizedLocation,
             imageUrl: imageUrl,
             date: new Date().toISOString(),
             userId: req.user.uid,
-            userEmail: req.user.email || 'Anonymous', // Save email for display
-            userName: req.user.name || 'Anonymous',   // Save name for display
-            // Merge AI Data (prioritize AI if field missing)
+            userEmail: req.user.email || 'Anonymous',
+            userName: req.user.name || 'Anonymous',
             labels: aiMetadata.labels || [],
             colors: aiMetadata.colors || [],
-            category: req.body.category || aiMetadata.category || 'Uncategorized', // Prefer user input
-            description: req.body.description || aiMetadata.description || ''
+            category: req.body.category || aiMetadata.category || 'Uncategorized',
         };
 
         const docRef = await db.collection('items').add(itemData);
@@ -178,10 +184,15 @@ exports.claimItem = async (req, res) => {
     const claimantName = req.user.name || 'A user';
     const claimantEmail = req.user.email || 'Someone';
 
+    // Sanitize inputs
+    const sanitizedMessage = sanitizeText(message, 500);
+    const sanitizedProof = sanitizeText(proof, 500);
+
     // Validation
     if (!itemId) return res.status(400).json({ error: "Item ID is required" });
-    if (message && message.length > 500) return res.status(400).json({ error: "Message too long (max 500 chars)" });
-    if (proof && proof.length > 500) return res.status(400).json({ error: "Proof details too long (max 500 chars)" });
+    if (!sanitizedProof || sanitizedProof.length < 20) {
+        return res.status(400).json({ error: "Proof of ownership is required (minimum 20 characters)" });
+    }
 
     try {
         // 1. Throttling: Check if user has too many active claims
@@ -211,19 +222,13 @@ exports.claimItem = async (req, res) => {
                 throw new Error("You cannot claim your own item.");
             }
 
-            // 2. Prevent multiple claims if already processed
-            // 2. FSM: Check if transition to CLAIM_REQUESTED is allowed
-            const currentStatus = itemData.status || ITEM_STATUS.REPORTED; // Default to REPORTED if undefined
-            if (!canTransition(currentStatus, ITEM_STATUS.CLAIM_REQUESTED)) {
-                throw new Error(`Item cannot be claimed from current status: ${currentStatus}`);
-            }
+            // 2. FSM: Use transitionItemStatus for enforcement
+            const currentStatus = itemData.status || ITEM_STATUS.REPORTED;
+            const transitionResult = await transitionItemStatus(itemRef, currentStatus, ITEM_STATUS.CLAIM_REQUESTED, t);
 
-            // 3. Update status to CLAIMED
-            t.update(itemRef, {
-                status: ITEM_STATUS.CLAIM_REQUESTED,
-                claimantId: claimantId,
-                claimedAt: new Date().toISOString()
-            });
+            if (!transitionResult.success) {
+                throw new Error(transitionResult.error);
+            }
 
             // 4. Create Notification
             const notifRef = db.collection('notifications').doc();
@@ -305,18 +310,12 @@ exports.updateItemStatus = async (req, res) => {
         const itemData = itemDoc.data();
         const currentStatus = itemData.status || ITEM_STATUS.REPORTED;
 
-        // FSM: Validate Transition
-        if (!canTransition(currentStatus, status)) {
-            return res.status(400).json({
-                error: `Invalid status transition from ${currentStatus} to ${status}.`
-            });
-        }
+        // FSM: Use transitionItemStatus for enforcement
+        const transitionResult = await transitionItemStatus(itemRef, currentStatus, status);
 
-        await itemRef.update({
-            status: status,
-            updatedAt: new Date().toISOString(),
-            resolvedAt: (status === ITEM_STATUS.RESOLVED) ? new Date().toISOString() : null
-        });
+        if (!transitionResult.success) {
+            return res.status(400).json({ error: transitionResult.error });
+        }
 
         // Notify Claimant via Email if item is resolved
         if ((status === ITEM_STATUS.RESOLVED) && itemData.claimantId) {

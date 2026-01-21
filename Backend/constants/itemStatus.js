@@ -37,4 +37,50 @@ const canTransition = (currentStatus, nextStatus) => {
     return false;
 };
 
-module.exports = { ITEM_STATUS, ALLOWED_TRANSITIONS, canTransition };
+/**
+ * SINGLE SOURCE OF TRUTH for status transitions.
+ * All status changes MUST go through this function.
+ * 
+ * @param {FirebaseFirestore.DocumentReference} itemRef - Reference to the item document
+ * @param {string} currentStatus - Current status of the item
+ * @param {string} newStatus - Desired new status
+ * @param {FirebaseFirestore.Transaction} [transaction] - Optional transaction context
+ * @returns {Promise<{success: boolean, error?: string}>}
+ */
+const transitionItemStatus = async (itemRef, currentStatus, newStatus, transaction = null) => {
+    // 1. Validate transition
+    if (!canTransition(currentStatus, newStatus)) {
+        return {
+            success: false,
+            error: `Invalid transition from ${currentStatus} to ${newStatus}`
+        };
+    }
+
+    // 2. Prepare update data
+    const updateData = {
+        status: newStatus,
+        updatedAt: new Date().toISOString()
+    };
+
+    // Add terminal state markers
+    if (newStatus === ITEM_STATUS.RESOLVED || newStatus === ITEM_STATUS.SECURED) {
+        updateData.resolvedAt = new Date().toISOString();
+    }
+
+    // 3. Execute update (with or without transaction)
+    try {
+        if (transaction) {
+            transaction.update(itemRef, updateData);
+        } else {
+            await itemRef.update(updateData);
+        }
+        return { success: true };
+    } catch (error) {
+        return {
+            success: false,
+            error: `Failed to update status: ${error.message}`
+        };
+    }
+};
+
+module.exports = { ITEM_STATUS, ALLOWED_TRANSITIONS, canTransition, transitionItemStatus };

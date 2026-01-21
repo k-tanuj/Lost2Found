@@ -8,16 +8,24 @@ service cloud.firestore {
     }
 
     // 🔔 Notifications:
-    // - Users can ONLY hear/read their OWN notifications via onSnapshot
-    // - Writes must go through the Backend API (Admin SDK)
+    // - Users can ONLY read their OWN notifications
+    // - Users can ONLY mark their own notifications as 'read' (no other field changes)
+    // - All creates/deletes must go through Backend API (Admin SDK)
     match /notifications/{notificationId} {
       allow read: if request.auth != null && resource.data.userId == request.auth.uid;
-      allow write: if false;
+      
+      // Allow users to mark their own notifications as read ONLY
+      allow update: if request.auth != null 
+                    && resource.data.userId == request.auth.uid
+                    && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['read'])
+                    && request.resource.data.read == true;
+      
+      allow create, delete: if false; // Backend only
     }
     
     // 📦 Items:
-    // - All item operations (read/write) go through the Backend API.
-    // - Direct Firestore access is blocked to prevent scraping or bypass.
+    // - ALL operations (read/write) go through the Backend API
+    // - Direct Firestore access is BLOCKED to prevent scraping, bypass, or data corruption
     match /items/{itemId} {
       allow read, write: if false;
     }
