@@ -2,17 +2,11 @@ import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'r
 import { AuthProvider, useAuth } from './context/AuthContext';
 import Login from './pages/Login';
 import Homepage from './pages/Homepage';
-import Dashboard from './pages/Dashboard';
-import Report from './pages/Report';
 import ReportWizard from './pages/ReportWizard';
 import Browse from './pages/Browse';
-import Matches from './pages/Matches';
-import Search from './pages/Search';
-import Activity from './pages/Activity';
 import MyReports from './pages/MyReports';
 import Profile from './pages/Profile';
 import ItemDetail from './pages/ItemDetail';
-import Guide from './pages/Guide';
 import { NotificationProvider } from './context/NotificationContext';
 import { ThemeProvider } from './context/ThemeContext';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -39,30 +33,6 @@ const AnimatedRoutes = () => {
           }
         />
         <Route
-          path="/dashboard"
-          element={
-            <PrivateRoute>
-              <PageWrapper><Dashboard /></PageWrapper>
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/activity"
-          element={
-            <PrivateRoute>
-              <PageWrapper><Activity /></PageWrapper>
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/report"
-          element={
-            <PrivateRoute>
-              <PageWrapper><Report /></PageWrapper>
-            </PrivateRoute>
-          }
-        />
-        <Route
           path="/browse"
           element={
             <PrivateRoute>
@@ -78,19 +48,9 @@ const AnimatedRoutes = () => {
             </PrivateRoute>
           }
         />
-        <Route
-          path="/matches/:id"
-          element={
-            <PrivateRoute>
-              <PageWrapper><Matches /></PageWrapper>
-            </PrivateRoute>
-          }
-        />
-        <Route path="/search" element={<PrivateRoute><PageWrapper><Search /></PageWrapper></PrivateRoute>} />
         <Route path="/my-reports" element={<PrivateRoute><PageWrapper><MyReports /></PageWrapper></PrivateRoute>} />
         <Route path="/profile" element={<PrivateRoute><PageWrapper><Profile /></PageWrapper></PrivateRoute>} />
         <Route path="/item/:id" element={<PrivateRoute><PageWrapper><ItemDetail /></PageWrapper></PrivateRoute>} />
-        <Route path="/guide" element={<PrivateRoute><PageWrapper><Guide /></PageWrapper></PrivateRoute>} />
       </Routes>
     </AnimatePresence>
   );
