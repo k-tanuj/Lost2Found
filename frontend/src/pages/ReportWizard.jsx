@@ -60,7 +60,7 @@ export default function ReportWizard() {
             }
 
             if (formData.locationText) {
-                data.append('location', formData.locationText);
+                data.append('locationText', formData.locationText);
             }
 
             const result = await reportItem(data);
