@@ -1,3 +1,12 @@
+---
+title: Lost2Found
+emoji: 🎒
+colorFrom: indigo
+colorTo: blue
+sdk: docker
+pinned: false
+app_port: 7860
+---
 
 # 🚀 Lost2Found
 
