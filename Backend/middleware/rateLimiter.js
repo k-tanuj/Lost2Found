@@ -7,7 +7,7 @@ const reportLimiter = rateLimit({
     message: { error: 'Too many reports. Please try again in an hour.' },
     standardHeaders: true,
     legacyHeaders: false,
-    keyGenerator: (req) => req.user?.uid || req.ip, // Use user ID if authenticated, otherwise IP
+    // Use default keyGenerator which properly handles IPv6
 });
 
 // Rate limiter for claiming items (5 claims per hour per user)
@@ -17,7 +17,7 @@ const claimLimiter = rateLimit({
     message: { error: 'Too many claim requests. Please try again in an hour.' },
     standardHeaders: true,
     legacyHeaders: false,
-    keyGenerator: (req) => req.user?.uid || req.ip,
+    // Use default keyGenerator which properly handles IPv6
 });
 
 module.exports = { reportLimiter, claimLimiter };
