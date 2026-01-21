@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Bell } from 'lucide-react';
 import { markNotificationRead } from '../services/api';
 import { useAuth } from '../context/AuthContext';
@@ -7,6 +8,7 @@ import { collection, query, where, onSnapshot } from 'firebase/firestore';
 
 export default function NotificationBell() {
     const { currentUser } = useAuth();
+    const navigate = useNavigate();
     const [notifications, setNotifications] = useState([]);
     const [unreadCount, setUnreadCount] = useState(0);
     const [isOpen, setIsOpen] = useState(false);
@@ -97,7 +99,21 @@ export default function NotificationBell() {
                                     className={`p-4 border-b border-slate-50 hover:bg-slate-50 transition-colors cursor-pointer 
                                             ${!notif.read && notif.priority === 'HIGH' ? 'bg-indigo-50/60 border-l-4 border-l-indigo-600' :
                                             !notif.read ? 'bg-indigo-50/20' : ''}`}
-                                    onClick={() => !notif.read && notif.status !== 'ACTION_REQUIRED' && handleMarkRead(notif.id)}
+                                    onClick={() => {
+                                        if (!notif.read && notif.status !== 'ACTION_REQUIRED') {
+                                            handleMarkRead(notif.id);
+                                        }
+                                        // Handle potential_match notifications
+                                        if (notif.type === 'potential_match') {
+                                            setIsOpen(false);
+                                            navigate('/matches', {
+                                                state: {
+                                                    matchedItems: notif.matchedItems || [],
+                                                    itemId: notif.itemId
+                                                }
+                                            });
+                                        }
+                                    }}
                                 >
                                     <div className="flex justify-between items-start mb-1">
                                         <div className="flex items-center gap-2">
