@@ -45,15 +45,16 @@ export default function Activity() {
     };
 
     const getStateHint = (item, stepStatus) => {
-        if (stepStatus === 'Reported') return "Live in AI Network";
+        if (stepStatus === 'Reported') return "Live: Systems Scanning";
         if (stepStatus === 'Claimed') {
-            if (item.status === ITEM_STATUS.REPORTED) return "Waiting for matching";
-            if (item.status === ITEM_STATUS.CLAIM_REQUESTED) return "REVIEW REQUIRED";
+            if (item.status === ITEM_STATUS.REPORTED) return "Action: Wait for Match";
+            if (item.status === ITEM_STATUS.MATCH_FOUND) return "Action: Review Matches";
+            if (item.status === ITEM_STATUS.CLAIM_REQUESTED) return "Action: Verify Claimant";
             return "In Verification";
         }
         if (stepStatus === 'Resolved') {
-            if (item.status === ITEM_STATUS.RESOLVED || item.status === ITEM_STATUS.SECURED) return "Safe & Sound";
-            return "Final Step";
+            if (item.status === ITEM_STATUS.RESOLVED || item.status === ITEM_STATUS.SECURED) return "Complete: Secure & Closed";
+            return "Goal: Handover";
         }
         return null;
     };

@@ -76,7 +76,26 @@ export default function ItemDetail() {
                         </div>
                     </div>
 
-                    <div className="p-8 md:p-12">
+                    <div className="p-6 md:p-12">
+                        {/* Next Step Hint */}
+                        <div className="mb-6 flex justify-center">
+                            {(item.status === ITEM_STATUS.REPORTED) && (
+                                <span className="px-3 py-1 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 text-xs font-bold rounded-full animate-pulse border border-indigo-100 dark:border-indigo-800">
+                                    Next: Waiting for AI Match
+                                </span>
+                            )}
+                            {(item.status === ITEM_STATUS.MATCH_FOUND) && (
+                                <span className="px-3 py-1 bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 text-xs font-bold rounded-full border border-amber-100 dark:border-amber-800">
+                                    Next: Review Potential Matches
+                                </span>
+                            )}
+                            {(item.status === ITEM_STATUS.CLAIM_REQUESTED) && (
+                                <span className="px-3 py-1 bg-purple-50 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 text-xs font-bold rounded-full border border-purple-100 dark:border-purple-800">
+                                    Next: Verify Ownership Claims
+                                </span>
+                            )}
+                        </div>
+
                         {/* Status Badge */}
                         <div className="flex justify-center -mt-16 mb-8 relative z-20">
                             <div className={`px-6 py-3 rounded-2xl shadow-xl font-black uppercase tracking-widest text-sm flex items-center gap-3

@@ -51,6 +51,16 @@ exports.getUserItems = async (req, res) => {
 exports.createItem = async (req, res) => {
     try {
         const { type } = req.params;
+        const { title, locationText } = req.body;
+
+        // Validation: Required Fields
+        if (!title || !title.trim()) {
+            return res.status(400).json({ error: "Title is required" });
+        }
+        if (!locationText || !locationText.trim()) {
+            return res.status(400).json({ error: "Location is required" });
+        }
+
         let imageUrl = req.body.imageUrl || '';
 
 
@@ -167,6 +177,11 @@ exports.claimItem = async (req, res) => {
     const claimantId = req.user.uid;
     const claimantName = req.user.name || 'A user';
     const claimantEmail = req.user.email || 'Someone';
+
+    // Validation
+    if (!itemId) return res.status(400).json({ error: "Item ID is required" });
+    if (message && message.length > 500) return res.status(400).json({ error: "Message too long (max 500 chars)" });
+    if (proof && proof.length > 500) return res.status(400).json({ error: "Proof details too long (max 500 chars)" });
 
     try {
         // 1. Throttling: Check if user has too many active claims

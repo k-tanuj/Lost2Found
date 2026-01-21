@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
+import { useNotification } from '../context/NotificationContext';
 import { getUserItems } from '../services/api';
 import { ITEM_STATUS } from '../constants/itemStatus';
 import Navbar from '../components/Navbar';
@@ -14,6 +15,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 export default function Profile() {
     const navigate = useNavigate();
     const { currentUser, logout } = useAuth();
+    const notification = useNotification();
     const { theme, toggleTheme } = useTheme();
     const [stats, setStats] = useState({ lost: 0, found: 0, resolved: 0 });
     const [loading, setLoading] = useState(true);
@@ -44,6 +46,7 @@ export default function Profile() {
             navigate('/');
         } catch (error) {
             console.error("Failed to logout", error);
+            notification.error("Failed to log out. Please try again.");
         }
     };
 

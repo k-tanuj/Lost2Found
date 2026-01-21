@@ -4,7 +4,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { getMatches, getItemById, createNotification, claimItem } from '../services/api';
 import { ITEM_STATUS } from '../constants/itemStatus';
 import Navbar from '../components/Navbar';
-import { MapPin, Calendar, Info, X, CheckCircle, ExternalLink, Shield, AlertCircle } from 'lucide-react';
+import { MapPin, Calendar, Info, X, CheckCircle, ExternalLink, Shield, AlertCircle, SearchX } from 'lucide-react';
 import { useNotification } from '../context/NotificationContext';
 import { useAuth } from '../context/AuthContext';
 
@@ -204,7 +204,9 @@ export default function Matches() {
 
                 {!loading && matches.length === 0 && (
                     <div className="text-center py-24 bg-white rounded-3xl shadow-sm border border-slate-200">
-                        <div className="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-6 text-4xl">🤷‍♂️</div>
+                        <div className="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-6 text-slate-400">
+                            <SearchX className="w-10 h-10" />
+                        </div>
                         <h3 className="text-xl font-bold text-slate-900 mb-2">No matches found yet</h3>
                         <p className="text-slate-500 max-w-md mx-auto mb-8">Don't worry, we're continuously scanning. We'll notify you when we find something similar.</p>
                         <button onClick={() => navigate('/dashboard')} className="text-indigo-600 font-bold hover:text-indigo-800 transition-colors flex items-center justify-center gap-2 mx-auto">

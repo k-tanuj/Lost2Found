@@ -3,11 +3,13 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { uploadImage, reportItem } from '../services/api';
 import { useAuth } from '../context/AuthContext';
+import { useNotification } from '../context/NotificationContext';
 import Navbar from '../components/Navbar';
 import { UploadCloud, MapPin, Calendar, Type, Loader2, Sparkles } from 'lucide-react';
 
 export default function Report() {
     const { currentUser } = useAuth();
+    const notification = useNotification();
     const navigate = useNavigate();
     const [loading, setLoading] = useState(false);
     const [file, setFile] = useState(null);
@@ -62,11 +64,12 @@ export default function Report() {
             const result = await reportItem(data);
 
             setScanning(false);
+            notification.success("Item reported successfully! Checking for matches...");
             navigate(`/matches/${result.item.id}`);
         } catch (error) {
             console.error("Error reporting item:", error);
             const errMsg = error.response?.data?.error || error.message;
-            alert(`FAILED: ${errMsg}`);
+            notification.error(`Failed to report: ${errMsg}`);
             setScanning(false);
         } finally {
             setLoading(false);

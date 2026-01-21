@@ -2,38 +2,24 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     
-    // Helper: Is user authenticated?
-    function isSignedIn() {
-      return request.auth != null;
+    // 🔒 Default: Deny all access
+    match /{document=**} {
+      allow read, write: if false;
     }
 
-    // Helper: Is user the owner of the document?
-    function isOwner(userId) {
-      return request.auth.uid == userId;
+    // 🔔 Notifications:
+    // - Users can ONLY hear/read their OWN notifications via onSnapshot
+    // - Writes must go through the Backend API (Admin SDK)
+    match /notifications/{notificationId} {
+      allow read: if request.auth != null && resource.data.userId == request.auth.uid;
+      allow write: if false;
     }
-
-    // Items Collection
+    
+    // 📦 Items:
+    // - All item operations (read/write) go through the Backend API.
+    // - Direct Firestore access is blocked to prevent scraping or bypass.
     match /items/{itemId} {
-      // Anyone signed in can read items (to search/browse)
-      allow read: if isSignedIn();
-      
-      // Only owners can delete or update their own items
-      allow create: if isSignedIn();
-      allow update, delete: if isSignedIn() && isOwner(resource.data.userId);
-    }
-
-    // Notifications Collection
-    match /notifications/{notifId} {
-      // Users can only see their own notifications
-      allow read: if isSignedIn() && isOwner(resource.data.userId);
-      
-      // Users can update their own notifications (e.g. mark as read)
-      allow update: if isSignedIn() && isOwner(resource.data.userId);
-      
-      // Notification creation is usually handled by the server (Admin SDK),
-      // but if done from frontend, restrict it to signed-in users.
-      // Better to keep this restricted to server side for claim integrity.
-      allow create: if isSignedIn();
+      allow read, write: if false;
     }
   }
 }

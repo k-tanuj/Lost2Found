@@ -146,8 +146,8 @@ export default function Dashboard() {
                                     <div className="w-20 h-20 bg-slate-50 dark:bg-slate-800 rounded-3xl flex items-center justify-center mx-auto mb-6 text-slate-300 dark:text-slate-700">
                                         <Search className="w-10 h-10" />
                                     </div>
-                                    <h4 className="text-lg font-bold text-slate-900 dark:text-white mb-2">Queue is Empty</h4>
-                                    <p className="text-slate-500 dark:text-slate-500 max-w-xs mx-auto">No items have been reported in your area yet. Be the first!</p>
+                                    <h4 className="text-lg font-bold text-slate-900 dark:text-white mb-2">All Quiet in the Network</h4>
+                                    <p className="text-slate-500 dark:text-slate-500 max-w-xs mx-auto">No recent reports in your area. Everything seems to be right where it belongs!</p>
                                 </div>
                             )}
                         </motion.div>
