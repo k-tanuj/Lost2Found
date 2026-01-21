@@ -73,7 +73,7 @@ export default function Matches() {
             // For now, let's just show success. 
         } catch (error) {
             console.error("Claim failed", error);
-            const errorMsg = error.response?.data?.error || "Failed to send claim request.";
+            const errorMsg = error.response?.data?.error || "Failed to send claim request. Please try again.";
             notification.error(errorMsg);
         }
     };

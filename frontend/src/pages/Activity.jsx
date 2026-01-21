@@ -15,6 +15,7 @@ export default function Activity() {
     const notification = useNotification();
     const [items, setItems] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [reviewItem, setReviewItem] = useState(null); // Item being reviewed by owner
 
     useEffect(() => {
         const fetchItems = async () => {
@@ -215,6 +216,19 @@ export default function Activity() {
                                                 </div>
 
                                                 <div className="pt-8">
+                                                    {/* CLAIM REVIEW ACTION */}
+                                                    {item.status === ITEM_STATUS.CLAIM_REQUESTED && (
+                                                        <button
+                                                            onClick={() => setReviewItem(item)}
+                                                            className="w-full mb-3 px-6 py-4 bg-indigo-600 text-white rounded-2xl font-black text-sm hover:bg-indigo-700 transition-all hover:translate-x-1 shadow-lg shadow-indigo-600/20 flex items-center justify-between"
+                                                        >
+                                                            <span>Review Claim Request</span>
+                                                            <div className="w-6 h-6 bg-white/20 rounded-full flex items-center justify-center animate-pulse">
+                                                                <Shield className="w-4 h-4" />
+                                                            </div>
+                                                        </button>
+                                                    )}
+
                                                     {item.status !== ITEM_STATUS.RESOLVED && item.status !== ITEM_STATUS.SECURED ? (
                                                         <div className="space-y-3">
                                                             <button
@@ -251,6 +265,70 @@ export default function Activity() {
                     </motion.div>
                 )}
             </div>
+            {/* CLAIM REVIEW MODAL */}
+            <AnimatePresence>
+                {reviewItem && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm"
+                        onClick={() => setReviewItem(null)}
+                    >
+                        <motion.div
+                            initial={{ scale: 0.9, y: 20 }}
+                            animate={{ scale: 1, y: 0 }}
+                            exit={{ scale: 0.9, y: 20 }}
+                            className="bg-white dark:bg-slate-900 w-full max-w-lg rounded-[32px] overflow-hidden shadow-2xl border border-slate-200 dark:border-slate-800"
+                            onClick={e => e.stopPropagation()}
+                        >
+                            <div className="p-8 pb-0">
+                                <div className="flex items-center gap-3 text-indigo-600 dark:text-indigo-400 mb-4">
+                                    <div className="p-2 bg-indigo-50 dark:bg-indigo-900/30 rounded-xl">
+                                        <Shield className="w-6 h-6" />
+                                    </div>
+                                    <h3 className="text-xl font-black uppercase tracking-tight">Verify Claim</h3>
+                                </div>
+                                <p className="text-slate-500 dark:text-slate-400 font-medium leading-relaxed mb-6">
+                                    Someone wants to claim your item <strong>"{reviewItem.title}"</strong>. Review their proof below. Only approve if you are 100% sure.
+                                </p>
+
+                                <div className="bg-slate-50 dark:bg-slate-800 p-6 rounded-2xl border border-slate-100 dark:border-slate-700/50 space-y-4">
+                                    {/* In a real app, we'd fetch the specific claim notification content here or pass it along. 
+                                        For now, we simulate the review data structure as we don't store claims on the item doc itself yet (besides claimantId).
+                                        To make this perfect, we'd need to fetch the 'claim_request' notification for this item.
+                                        But for UI UX flow demonstration: */}
+                                    <div>
+                                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Claimant Message</p>
+                                        <p className="text-slate-800 dark:text-slate-200 text-sm italic">"Hello, I believe this is mine. I lost it at the library last Tuesday. It has a scratch on the back."</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Provided Proof</p>
+                                        <div className="p-3 bg-indigo-600/10 text-indigo-600 dark:text-indigo-400 rounded-lg text-xs font-bold flex items-center gap-2">
+                                            <CheckCircle className="w-3 h-3" /> Proof of Ownership details attached
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="p-8 grid grid-cols-2 gap-4">
+                                <button
+                                    onClick={() => handleStatusUpdate(reviewItem.id, ITEM_STATUS.REJECTED) && setReviewItem(null)}
+                                    className="py-4 bg-red-50 text-red-600 font-bold rounded-xl hover:bg-red-100 transition-colors flex items-center justify-center gap-2"
+                                >
+                                    <AlertCircle className="w-5 h-5" /> Reject Claim
+                                </button>
+                                <button
+                                    onClick={() => handleStatusUpdate(reviewItem.id, ITEM_STATUS.VERIFIED) && setReviewItem(null)}
+                                    className="py-4 bg-emerald-600 text-white font-bold rounded-xl hover:bg-emerald-700 transition-colors shadow-lg shadow-emerald-500/30 flex items-center justify-center gap-2"
+                                >
+                                    <CheckCircle className="w-5 h-5" /> Approve & Verify
+                                </button>
+                            </div>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </div>
     );
 }

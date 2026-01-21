@@ -5,7 +5,7 @@ const stream = require('stream');
 const axios = require('axios');
 const QRCode = require('qrcode');
 const { sendEmail } = require('../utils/email');
-const { ITEM_STATUS, ALLOWED_TRANSITIONS } = require('../constants/itemStatus');
+const { ITEM_STATUS, ALLOWED_TRANSITIONS, canTransition } = require('../constants/itemStatus');
 
 exports.getItems = async (req, res) => {
     try {
@@ -214,7 +214,7 @@ exports.claimItem = async (req, res) => {
             // 2. Prevent multiple claims if already processed
             // 2. FSM: Check if transition to CLAIM_REQUESTED is allowed
             const currentStatus = itemData.status || ITEM_STATUS.REPORTED; // Default to REPORTED if undefined
-            if (!ALLOWED_TRANSITIONS[currentStatus]?.includes(ITEM_STATUS.CLAIM_REQUESTED)) {
+            if (!canTransition(currentStatus, ITEM_STATUS.CLAIM_REQUESTED)) {
                 throw new Error(`Item cannot be claimed from current status: ${currentStatus}`);
             }
 
@@ -306,9 +306,9 @@ exports.updateItemStatus = async (req, res) => {
         const currentStatus = itemData.status || ITEM_STATUS.REPORTED;
 
         // FSM: Validate Transition
-        if (!ALLOWED_TRANSITIONS[currentStatus]?.includes(status)) {
+        if (!canTransition(currentStatus, status)) {
             return res.status(400).json({
-                error: `Invalid status transition from ${currentStatus} to ${status}. Allowed: ${ALLOWED_TRANSITIONS[currentStatus]?.join(', ')}`
+                error: `Invalid status transition from ${currentStatus} to ${status}.`
             });
         }
 

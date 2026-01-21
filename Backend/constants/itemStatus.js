@@ -19,4 +19,22 @@ const ALLOWED_TRANSITIONS = {
     [ITEM_STATUS.RESOLVED]: [], // Terminal state
 };
 
-module.exports = { ITEM_STATUS, ALLOWED_TRANSITIONS };
+/**
+ * Validates if a status transition is allowed.
+ * @param {string} currentStatus - The current status of the item.
+ * @param {string} nextStatus - The desired new status.
+ * @returns {boolean} - True if transition is valid, false otherwise.
+ */
+const canTransition = (currentStatus, nextStatus) => {
+    // 1. If status is undefined, assume REPORTED (initial state) for strictness
+    const start = currentStatus || ITEM_STATUS.REPORTED;
+
+    // 2. Direct lookup in allowed transitions
+    if (ALLOWED_TRANSITIONS[start] && ALLOWED_TRANSITIONS[start].includes(nextStatus)) {
+        return true;
+    }
+
+    return false;
+};
+
+module.exports = { ITEM_STATUS, ALLOWED_TRANSITIONS, canTransition };
