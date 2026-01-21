@@ -1,8 +1,10 @@
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import Login from './pages/Login';
+import Homepage from './pages/Homepage';
 import Dashboard from './pages/Dashboard';
 import Report from './pages/Report';
+import ReportWizard from './pages/ReportWizard';
 import Matches from './pages/Matches';
 import Search from './pages/Search';
 import Activity from './pages/Activity';
@@ -28,6 +30,14 @@ const AnimatedRoutes = () => {
       <Routes location={location} key={location.pathname}>
         <Route path="/" element={<Login />} />
         <Route
+          path="/home"
+          element={
+            <PrivateRoute>
+              <PageWrapper><Homepage /></PageWrapper>
+            </PrivateRoute>
+          }
+        />
+        <Route
           path="/dashboard"
           element={
             <PrivateRoute>
@@ -48,6 +58,14 @@ const AnimatedRoutes = () => {
           element={
             <PrivateRoute>
               <PageWrapper><Report /></PageWrapper>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/report/:type"
+          element={
+            <PrivateRoute>
+              <PageWrapper><ReportWizard /></PageWrapper>
             </PrivateRoute>
           }
         />

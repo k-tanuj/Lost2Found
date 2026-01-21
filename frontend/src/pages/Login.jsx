@@ -122,13 +122,13 @@ export default function Login() {
     const farBuildingsY = useTransform(smoothProgress, [0, 1], [0, -80]);
 
     useEffect(() => {
-        if (currentUser) navigate('/dashboard');
+        if (currentUser) navigate('/home');
     }, [currentUser, navigate]);
 
     const handleLogin = async () => {
         try {
             await login();
-            navigate('/dashboard');
+            navigate('/home');
         } catch (error) {
             console.error("Login failed", error);
         }
@@ -136,7 +136,7 @@ export default function Login() {
 
     const handleGuestLogin = () => {
         loginAsGuest();
-        navigate('/dashboard');
+        navigate('/home');
     };
 
     return (

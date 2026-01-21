@@ -62,10 +62,7 @@ export default function Navbar() {
                             {currentUser && (
                                 <div className="hidden md:flex items-center gap-2">
                                     {[
-                                        { name: 'Dashboard', path: '/dashboard' },
-                                        { name: 'Search', path: '/search' },
-                                        { name: 'Guide', path: '/guide' },
-                                        { name: 'Activity', path: '/activity' },
+                                        { name: 'Home', path: '/home' },
                                         { name: 'My Reports', path: '/my-reports' },
                                         { name: 'Profile', path: '/profile' }
                                     ].map((link) => (
@@ -117,12 +114,13 @@ export default function Navbar() {
                         </div>
                     </div>
                 </div>
-            </nav>
+            </nav >
             {currentUser && (
                 <div className="md:hidden">
                     <BottomNav />
                 </div>
-            )}
+            )
+            }
         </>
     );
 }
