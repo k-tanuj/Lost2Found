@@ -43,13 +43,16 @@ export default function Homepage() {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: 0.2 }}
-                    className="text-4xl font-bold text-slate-900 dark:text-white mb-16"
+                    className="text-4xl font-bold text-slate-900 dark:text-white mb-4"
                 >
                     What happened?
                 </motion.h2>
+                <p className="text-slate-500 dark:text-slate-400 mb-12 text-lg">
+                    Don’t worry — just tell us what happened. We’ll guide you.
+                </p>
 
                 {/* Two Large Buttons */}
-                <div className="space-y-6 mb-12">
+                <div className="space-y-6 mb-8">
                     <motion.button
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
@@ -57,10 +60,10 @@ export default function Homepage() {
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
                         onClick={() => navigate('/report/lost')}
-                        className="w-full py-8 px-8 bg-red-500 hover:bg-red-600 text-white rounded-full font-bold text-2xl shadow-2xl shadow-red-500/30 transition-all flex items-center justify-center gap-4"
+                        className="w-full py-8 px-8 bg-red-500 hover:bg-red-600 text-white rounded-full font-bold text-xl md:text-2xl shadow-2xl shadow-red-500/30 transition-all flex items-center justify-center gap-4 text-left md:text-center"
                     >
-                        <Search className="w-8 h-8" />
-                        I lost something
+                        <Search className="w-8 h-8 shrink-0" />
+                        <span>I lost something — help me find it</span>
                     </motion.button>
 
                     <motion.button
@@ -70,12 +73,16 @@ export default function Homepage() {
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
                         onClick={() => navigate('/report/found')}
-                        className="w-full py-8 px-8 bg-teal-500 hover:bg-teal-600 text-white rounded-full font-bold text-2xl shadow-2xl shadow-teal-500/30 transition-all flex items-center justify-center gap-4"
+                        className="w-full py-8 px-8 bg-teal-500 hover:bg-teal-600 text-white rounded-full font-bold text-xl md:text-2xl shadow-2xl shadow-teal-500/30 transition-all flex items-center justify-center gap-4 text-left md:text-center"
                     >
-                        <Package className="w-8 h-8" />
-                        I found something
+                        <Package className="w-8 h-8 shrink-0" />
+                        <span>I found something — I want to return it</span>
                     </motion.button>
                 </div>
+
+                <p className="text-slate-400 text-sm italic">
+                    You can’t do anything wrong here.
+                </p>
 
                 {/* Profile Link (Top Right) - Minimal Access Point */}
                 <div className="absolute top-6 right-6">

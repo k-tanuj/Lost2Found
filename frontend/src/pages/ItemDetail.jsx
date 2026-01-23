@@ -219,10 +219,10 @@ export default function ItemDetail() {
                         {item.status === 'RESOLVED' && (
                             <div className="p-6 bg-emerald-50 dark:bg-emerald-900/20 rounded-xl border-2 border-emerald-500 mb-8">
                                 <h3 className="font-bold text-emerald-700 dark:text-emerald-300 mb-2 flex items-center gap-2">
-                                    ✅ This case is closed
+                                    ✅ This item has been safely returned.
                                 </h3>
                                 <p className="text-slate-600 dark:text-slate-400">
-                                    This item has been successfully returned. No further action is needed.
+                                    You don’t need to do anything right now.
                                 </p>
                             </div>
                         )}
@@ -245,12 +245,12 @@ export default function ItemDetail() {
                                     <button
                                         onClick={() => setShowClaimForm(true)}
                                         className="w-full py-4 bg-teal-500 hover:bg-teal-600 text-white font-bold rounded-full transition-all flex items-center justify-center gap-2 shadow-lg">
-                                        {item.type === 'lost' ? '✅ I have this!' : '✅ This is mine!'}
+                                        ✅ This is mine
                                     </button>
                                 ) : (
                                     <div className="p-6 bg-white dark:bg-slate-800 rounded-xl border-2 border-teal-500">
                                         <h3 className="font-bold text-slate-900 dark:text-white mb-4">
-                                            {item.type === 'lost' ? 'Confirm you have this item' : 'Prove this is yours'}
+                                            This is mine
                                         </h3>
                                         <textarea
                                             value={claimProof}
