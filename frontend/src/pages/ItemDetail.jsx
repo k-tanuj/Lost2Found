@@ -19,6 +19,8 @@ export default function ItemDetail() {
     const [actionLoading, setActionLoading] = useState(false);
     const [matches, setMatches] = useState([]);
     const [matchesLoading, setMatchesLoading] = useState(false);
+    const [showClaimForm, setShowClaimForm] = useState(false);
+    const [claimProof, setClaimProof] = useState('');
 
     useEffect(() => {
         const fetchItemAndMatches = async () => {
