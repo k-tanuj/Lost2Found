@@ -104,14 +104,20 @@ export default function NotificationBell() {
                                             handleMarkRead(notif.id);
                                         }
                                         // Navigate based on notification type
-                                        if (notif.type === 'potential_match' && notif.itemId) {
-                                            // For potential matches, go to the item detail page to see matches
-                                            setIsOpen(false);
-                                            navigate(`/item/${notif.itemId}`);
-                                        } else if (notif.itemId) {
-                                            // For other notifications with itemId, go to My Reports
-                                            setIsOpen(false);
-                                            navigate('/my-reports');
+                                        if (notif.itemId) {
+                                            if (
+                                                notif.type === 'potential_match' ||
+                                                notif.type === 'CLAIM_REQUEST' ||
+                                                notif.type === 'MATCH_FOUND'
+                                            ) {
+                                                // Go to specific item detail for these types
+                                                setIsOpen(false);
+                                                navigate(`/item/${notif.itemId}`);
+                                            } else {
+                                                // Default fallback
+                                                setIsOpen(false);
+                                                navigate('/my-reports');
+                                            }
                                         }
                                     }}
                                 >
@@ -133,7 +139,7 @@ export default function NotificationBell() {
                                                 onClick={async () => {
                                                     await handleMarkRead(notif.id);
                                                     setIsOpen(false);
-                                                    navigate('/my-reports');
+                                                    navigate(`/item/${notif.itemId}`);
                                                 }}
                                                 className="flex-1 px-3 py-1.5 bg-indigo-600 text-white text-[10px] font-bold rounded-lg hover:bg-indigo-700 transition-colors shadow-sm"
                                             >
