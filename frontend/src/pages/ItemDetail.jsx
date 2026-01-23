@@ -107,6 +107,20 @@ export default function ItemDetail() {
         }
     };
 
+    const handleMarkResolved = async () => {
+        setActionLoading(true);
+        try {
+            await updateItemStatus(item.id, ITEM_STATUS.RESOLVED);
+            notification.success("Item marked as resolved!");
+            const updatedItem = await getItemById(id);
+            setItem(updatedItem);
+        } catch (error) {
+            notification.error("Failed to mark as resolved");
+        } finally {
+            setActionLoading(false);
+        }
+    };
+
     const handleClaim = async () => {
         setActionLoading(true);
         try {
@@ -329,8 +343,18 @@ export default function ItemDetail() {
                                     )}
                                     <p className="text-sm text-slate-500 text-center mt-4">
                                         Please arrange a safe meet-up to return the item.
-                                        {item.status !== 'RESOLVED' && " Mark as resolved in My Reports after exchange."}
+                                        {item.status !== 'RESOLVED' && " Click below to close the case after exchange."}
                                     </p>
+
+                                    {isOwner && item.status !== 'RESOLVED' && (
+                                        <button
+                                            onClick={handleMarkResolved}
+                                            disabled={actionLoading}
+                                            className="w-full py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-xl transition-all shadow-md mt-4 flex items-center justify-center gap-2"
+                                        >
+                                            <CheckCircle className="w-5 h-5" /> Mark as Resolved & Returned
+                                        </button>
+                                    )}
                                 </div>
                             </div>
                         )}

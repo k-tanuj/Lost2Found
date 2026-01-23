@@ -454,8 +454,31 @@ exports.updateItemStatus = async (req, res) => {
             }
         }
 
-        // Notify Claimant via Email if item is resolved
+        // Notify Claimant via Email and Auto-Resolve Counterpart
         if ((status === ITEM_STATUS.RESOLVED) && itemData.claimantId) {
+            // 1. Auto-resolve counterpart item
+            try {
+                const counterpartType = itemData.type === 'found' ? 'lost' : 'found';
+                const claimantItemsSnapshot = await db.collection('items')
+                    .where('userId', '==', itemData.claimantId)
+                    .where('type', '==', counterpartType)
+                    .where('status', '==', ITEM_STATUS.VERIFIED)
+                    .limit(1)
+                    .get();
+
+                if (!claimantItemsSnapshot.empty) {
+                    await db.collection('items').doc(claimantItemsSnapshot.docs[0].id).update({
+                        status: ITEM_STATUS.RESOLVED,
+                        resolvedAt: new Date().toISOString(),
+                        updatedAt: new Date().toISOString()
+                    });
+                    console.log("Auto-resolved counterpart item");
+                }
+            } catch (e) {
+                console.error("Failed to auto-resolve counterpart:", e);
+            }
+
+            // 2. Send Email
             try {
                 const claimantUser = await adminAuth.getUser(itemData.claimantId);
                 const claimantEmail = claimantUser.email;
