@@ -12,12 +12,12 @@
 export const getUserFacingStatus = (systemStatus, itemData = {}) => {
     const statusMap = {
         'REPORTED': "We're looking for your item.",
-        'MATCH_FOUND': "Good news! We might have found your item.",
-        'CLAIM_REQUESTED': "Someone says this is theirs.",
-        'VERIFIED': "Perfect! We connected you two.",
-        'RESOLVED': "All done. Glad we could help!",
-        'REJECTED': "That wasn't a match. We're still looking.",
-        'SECURED': "This item is safely stored."
+        'MATCH_FOUND': "Good news! We might have found a match.",
+        'CLAIM_REQUESTED': "Someone thinks this is theirs. Review their proof.",
+        'VERIFIED': "We connected you two. Please arrange a safe meet-up.",
+        'RESOLVED': "This item has been safely returned.",
+        'REJECTED': "That match didn't work out. We're still looking.",
+        'SECURED': "This item is safe."
     };
 
     return statusMap[systemStatus] || "We're working on this.";
