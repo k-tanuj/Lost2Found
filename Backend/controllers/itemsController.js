@@ -305,6 +305,12 @@ exports.claimItem = async (req, res) => {
                 throw new Error(transitionResult.error);
             }
 
+            // 3. Update Item with Claimant Proof
+            t.update(itemRef, {
+                claimantProof: proof || "No additional proof provided.",
+                claimantId: claimantId // Store claimant ID early for reference
+            });
+
             // 4. Create Notification
             const notifRef = db.collection('notifications').doc();
             const notification = {

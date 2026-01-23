@@ -164,7 +164,7 @@ export default function ItemDetail() {
                                 <h3 className="text-sm font-bold text-slate-400 uppercase tracking-wider">Their proof</h3>
                                 <div className="bg-indigo-50 dark:bg-indigo-900/20 p-6 rounded-2xl border border-indigo-100 dark:border-indigo-800 h-full flex items-center">
                                     <p className="text-slate-700 dark:text-slate-300 italic">
-                                        "I believe this is mine. I lost it at the {item.locationText} on {new Date(item.date).toLocaleDateString()}."
+                                        "{item.claimantProof || "No additional proof provided."}"
                                     </p>
                                 </div>
                             </div>
