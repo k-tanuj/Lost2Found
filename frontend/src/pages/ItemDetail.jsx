@@ -204,21 +204,25 @@ export default function ItemDetail() {
                         </div>
 
                         {/* Claim Button for Non-Owners */}
-                        {!isOwner && item.status !== 'RESOLVED' && item.status !== 'VERIFIED' && (
+                        {!isOwner && item.status !== 'RESOLVED' && (
                             <div className="mt-8">
                                 {!showClaimForm ? (
                                     <button
                                         onClick={() => setShowClaimForm(true)}
                                         className="w-full py-4 bg-teal-500 hover:bg-teal-600 text-white font-bold rounded-full transition-all flex items-center justify-center gap-2 shadow-lg">
-                                        ✅ This is mine!
+                                        {item.type === 'lost' ? '✅ I have this!' : '✅ This is mine!'}
                                     </button>
                                 ) : (
                                     <div className="p-6 bg-white dark:bg-slate-800 rounded-xl border-2 border-teal-500">
-                                        <h3 className="font-bold text-slate-900 dark:text-white mb-4">Prove this is yours</h3>
+                                        <h3 className="font-bold text-slate-900 dark:text-white mb-4">
+                                            {item.type === 'lost' ? 'Confirm you have this item' : 'Prove this is yours'}
+                                        </h3>
                                         <textarea
                                             value={claimProof}
                                             onChange={(e) => setClaimProof(e.target.value)}
-                                            placeholder="Describe something unique about this item that proves it's yours..."
+                                            placeholder={item.type === 'lost'
+                                                ? "Describe where you found it and any unique details..."
+                                                : "Describe something unique about this item that proves it's yours..."}
                                             className="w-full p-3 border-2 border-slate-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-900 text-slate-900 dark:text-white mb-4"
                                             rows="4"
                                         />
@@ -235,7 +239,7 @@ export default function ItemDetail() {
                                                 onClick={handleClaim}
                                                 disabled={!claimProof.trim() || actionLoading}
                                                 className="flex-1 py-2 bg-teal-500 hover:bg-teal-600 disabled:bg-slate-300 text-white font-bold rounded-xl transition-all">
-                                                {actionLoading ? 'Submitting...' : 'Submit Claim'}
+                                                {actionLoading ? 'Submitting...' : item.type === 'lost' ? 'Notify Owner' : 'Submit Claim'}
                                             </button>
                                         </div>
                                     </div>
