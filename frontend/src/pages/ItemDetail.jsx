@@ -22,12 +22,14 @@ export default function ItemDetail() {
 
     useEffect(() => {
         const fetchItemAndMatches = async () => {
+            setLoading(true);
+            setMatches([]);
             try {
                 const data = await getItemById(id);
                 setItem(data);
 
-                // If current user is owner, fetch matches
-                if (currentUser && data.userId === currentUser.uid) {
+                // If current user is owner and data exists, fetch matches
+                if (data && currentUser && data.userId === currentUser.uid) {
                     setMatchesLoading(true);
                     try {
                         const matchData = await getMatches(id);
@@ -40,11 +42,15 @@ export default function ItemDetail() {
                 }
             } catch (error) {
                 console.error("Failed to fetch item", error);
+                setItem(null);
             } finally {
                 setLoading(false);
             }
         };
-        if (id && currentUser) fetchItemAndMatches();
+
+        if (id && currentUser) {
+            fetchItemAndMatches();
+        }
     }, [id, currentUser]);
 
     if (loading) {
