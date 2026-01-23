@@ -1,10 +1,10 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Bell } from 'lucide-react';
+import { Bell, Trash2 } from 'lucide-react';
 import { markNotificationRead } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { db } from '../firebase';
-import { collection, query, where, onSnapshot } from 'firebase/firestore';
+import { collection, query, where, onSnapshot, writeBatch, doc } from 'firebase/firestore';
 
 export default function NotificationBell() {
     const { currentUser } = useAuth();
@@ -21,8 +21,6 @@ export default function NotificationBell() {
         const q = query(
             collection(db, "notifications"),
             where("userId", "==", currentUser.uid)
-            // Note: server-side sorting requires an index.
-            // We sort client-side to ensure it works instantly for you.
         );
 
         const unsubscribe = onSnapshot(q, (snapshot) => {
@@ -57,14 +55,28 @@ export default function NotificationBell() {
     const handleMarkRead = async (id) => {
         try {
             await markNotificationRead(id);
-            // Notes: onSnapshot will automatically update the UI when the backend writes to Firestore!
-            // But for immediate feedback, we can also update local state if needed.
-            // With Flux/Real-time, we usually just wait for the server event,
-            // but optimistic updates feel snappier.
             setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true } : n));
             setUnreadCount(prev => Math.max(0, prev - 1));
         } catch (error) {
             console.error("Failed to mark read", error);
+        }
+    };
+
+    const handleClearAll = async () => {
+        if (notifications.length === 0) return;
+
+        try {
+            const batch = writeBatch(db);
+            notifications.forEach(notif => {
+                const notifRef = doc(db, "notifications", notif.id);
+                batch.delete(notifRef);
+            });
+            await batch.commit();
+            // Local state updaes automatically via onSnapshot, but we can reset proactively
+            setNotifications([]);
+            setUnreadCount(0);
+        } catch (error) {
+            console.error("Failed to clear notifications", error);
         }
     };
 
@@ -82,8 +94,16 @@ export default function NotificationBell() {
 
             {isOpen && (
                 <div className="absolute right-0 mt-3 w-80 bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden z-[100] animate-scale-in origin-top-right">
-                    <div className="p-4 border-b border-slate-100 flex justify-between items-center">
+                    <div className="p-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
                         <h3 className="font-bold text-slate-800">Notifications</h3>
+                        {notifications.length > 0 && (
+                            <button
+                                onClick={handleClearAll}
+                                className="text-xs font-bold text-slate-500 hover:text-red-500 flex items-center gap-1 transition-colors"
+                            >
+                                <Trash2 className="w-3 h-3" /> Clear All
+                            </button>
+                        )}
                     </div>
 
                     <div className="max-h-96 overflow-y-auto">
