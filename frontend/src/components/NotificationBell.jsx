@@ -103,8 +103,13 @@ export default function NotificationBell() {
                                         if (!notif.read && notif.status !== 'ACTION_REQUIRED') {
                                             handleMarkRead(notif.id);
                                         }
-                                        // Navigate to My Reports for all notifications
-                                        if (notif.type === 'potential_match' || notif.itemId) {
+                                        // Navigate based on notification type
+                                        if (notif.type === 'potential_match' && notif.itemId) {
+                                            // For potential matches, go to the item detail page to see matches
+                                            setIsOpen(false);
+                                            navigate(`/item/${notif.itemId}`);
+                                        } else if (notif.itemId) {
+                                            // For other notifications with itemId, go to My Reports
                                             setIsOpen(false);
                                             navigate('/my-reports');
                                         }
