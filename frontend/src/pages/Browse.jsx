@@ -133,8 +133,8 @@ export default function Browse() {
                                             📍 {item.locationText}
                                         </p>
 
-                                        {/* Claim Button */}
-                                        {claimingId !== item.id && (
+                                        {/* Claim Button - Only for available items */}
+                                        {claimingId !== item.id && item.status !== 'VERIFIED' && item.status !== 'RESOLVED' && (
                                             <button
                                                 onClick={() => setClaimingId(item.id)}
                                                 className="w-full py-3 bg-teal-500 hover:bg-teal-600 text-white font-bold rounded-full transition-all flex items-center justify-center gap-2 shadow-lg"
