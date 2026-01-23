@@ -86,6 +86,21 @@ export default function ItemDetail() {
         }
     };
 
+    const handleClaim = async () => {
+        setActionLoading(true);
+        try {
+            await claimItem(item.id, '', claimProof);
+            notification.success("Claim submitted! The owner will review it.");
+            setShowClaimForm(false);
+            setClaimProof('');
+            navigate('/my-reports');
+        } catch (error) {
+            notification.error(error.response?.data?.error || "Failed to submit claim");
+        } finally {
+            setActionLoading(false);
+        }
+    };
+
     return (
         <div className="min-h-screen bg-slate-50 dark:bg-slate-950 pb-20">
             <Navbar />
