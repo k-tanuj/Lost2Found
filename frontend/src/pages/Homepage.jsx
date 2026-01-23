@@ -33,6 +33,9 @@ export default function Homepage() {
                     <p className="text-slate-500 dark:text-slate-400 text-sm font-medium">
                         Reuniting people with their belongings
                     </p>
+                    <p className="text-slate-600 dark:text-slate-400 text-xs mt-2 max-w-md mx-auto">
+                        Report lost or found items. We'll help reconnect them.
+                    </p>
                 </motion.div>
 
                 {/* Main Question */}
@@ -54,7 +57,7 @@ export default function Homepage() {
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
                         onClick={() => navigate('/report/lost')}
-                        className="w-full py-8 px-8 bg-red-500 hover:bg-red-600 text-white rounded-3xl font-bold text-2xl shadow-2xl shadow-red-500/30 transition-all flex items-center justify-center gap-4"
+                        className="w-full py-8 px-8 bg-red-500 hover:bg-red-600 text-white rounded-full font-bold text-2xl shadow-2xl shadow-red-500/30 transition-all flex items-center justify-center gap-4"
                     >
                         <Search className="w-8 h-8" />
                         I lost something
@@ -67,7 +70,7 @@ export default function Homepage() {
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
                         onClick={() => navigate('/report/found')}
-                        className="w-full py-8 px-8 bg-emerald-500 hover:bg-emerald-600 text-white rounded-3xl font-bold text-2xl shadow-2xl shadow-emerald-500/30 transition-all flex items-center justify-center gap-4"
+                        className="w-full py-8 px-8 bg-teal-500 hover:bg-teal-600 text-white rounded-full font-bold text-2xl shadow-2xl shadow-teal-500/30 transition-all flex items-center justify-center gap-4"
                     >
                         <Package className="w-8 h-8" />
                         I found something

@@ -113,7 +113,7 @@ export default function Browse() {
                                     initial={{ opacity: 0, scale: 0.9 }}
                                     animate={{ opacity: 1, scale: 1 }}
                                     exit={{ opacity: 0, scale: 0.9 }}
-                                    className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 overflow-hidden hover:shadow-xl transition-shadow"
+                                    className="bg-white dark:bg-slate-900 rounded-2xl border-3 border-slate-900 dark:border-slate-700 overflow-hidden hover:shadow-xl transition-all"
                                 >
                                     {/* Image */}
                                     {item.imageUrl ? (
@@ -137,7 +137,7 @@ export default function Browse() {
                                         {claimingId !== item.id && (
                                             <button
                                                 onClick={() => setClaimingId(item.id)}
-                                                className="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-2xl transition-all flex items-center justify-center gap-2"
+                                                className="w-full py-3 bg-teal-500 hover:bg-teal-600 text-white font-bold rounded-full transition-all flex items-center justify-center gap-2 shadow-lg"
                                             >
                                                 ✅ This is mine!
                                             </button>
@@ -172,7 +172,7 @@ export default function Browse() {
                                                     <button
                                                         onClick={() => handleClaim(item.id)}
                                                         disabled={!claimProof.trim()}
-                                                        className="flex-1 py-2 bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-300 text-white font-bold rounded-xl transition-all"
+                                                        className="flex-1 py-2 bg-teal-500 hover:bg-teal-600 disabled:bg-slate-300 text-white font-bold rounded-xl transition-all"
                                                     >
                                                         Submit
                                                     </button>

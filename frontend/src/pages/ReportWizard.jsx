@@ -79,7 +79,7 @@ export default function ReportWizard() {
             setStep(totalSteps + 1);
         } catch (error) {
             console.error("Error reporting item:", error);
-            notification.error('Something went wrong. Please try again in a moment.');
+            notification.error('Oops! Try again in a moment.');
         } finally {
             setLoading(false);
         }

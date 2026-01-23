@@ -101,7 +101,7 @@ export default function MyReports() {
                                     initial={{ opacity: 0, y: 20 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     transition={{ delay: index * 0.1 }}
-                                    className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 overflow-hidden hover:shadow-xl transition-shadow"
+                                    className="bg-white dark:bg-slate-900 rounded-2xl border-3 border-slate-900 dark:border-slate-700 overflow-hidden hover:shadow-xl transition-all"
                                 >
                                     <div className="p-6 md:p-8 flex flex-col md:flex-row gap-6">
                                         {/* Image */}
@@ -181,7 +181,7 @@ export default function MyReports() {
                                             {action.needsAction && (
                                                 <button
                                                     onClick={() => navigate(`/item/${item.id}`)}
-                                                    className="inline-flex items-center gap-2 px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-2xl transition-all"
+                                                    className="inline-flex items-center gap-2 px-6 py-3 bg-teal-500 hover:bg-teal-600 text-white font-bold rounded-full transition-all shadow-lg"
                                                 >
                                                     {action.actionText} <ArrowRight className="w-5 h-5" />
                                                 </button>

@@ -98,7 +98,7 @@ export default function ItemDetail() {
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="bg-white dark:bg-slate-900 rounded-3xl shadow-2xl overflow-hidden border border-slate-200 dark:border-slate-800 p-8 md:p-12"
+                        className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl overflow-hidden border-3 border-slate-900 dark:border-slate-700 p-8 md:p-12"
                     >
                         <h2 className="text-3xl font-black text-slate-900 dark:text-white mb-2 text-center">
                             Does this belong to them?
@@ -137,14 +137,14 @@ export default function ItemDetail() {
                             <button
                                 onClick={handleReject}
                                 disabled={actionLoading}
-                                className="py-4 bg-red-50 hover:bg-red-100 text-red-600 font-bold rounded-2xl transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                                className="py-4 bg-red-50 hover:bg-red-100 text-red-600 font-bold rounded-full transition-all flex items-center justify-center gap-2 disabled:opacity-50"
                             >
                                 <XCircle className="w-5 h-5" /> No, this isn't theirs
                             </button>
                             <button
                                 onClick={handleApprove}
                                 disabled={actionLoading}
-                                className="py-4 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-2xl transition-all shadow-lg shadow-emerald-500/30 flex items-center justify-center gap-2 disabled:opacity-50"
+                                className="py-4 bg-teal-500 hover:bg-teal-600 text-white font-bold rounded-full transition-all shadow-lg shadow-teal-500/30 flex items-center justify-center gap-2 disabled:opacity-50"
                             >
                                 <CheckCircle className="w-5 h-5" /> Yes, this is theirs
                             </button>
@@ -155,7 +155,7 @@ export default function ItemDetail() {
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="bg-white dark:bg-slate-900 rounded-3xl shadow-2xl overflow-hidden border border-slate-200 dark:border-slate-800 p-8 md:p-12"
+                        className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl overflow-hidden border-3 border-slate-900 dark:border-slate-700 p-8 md:p-12"
                     >
                         {item.imageUrl && (
                             <img src={item.imageUrl} alt={item.title} className="w-full h-64 object-cover rounded-2xl mb-8 bg-slate-100 dark:bg-slate-800" />
@@ -173,6 +173,15 @@ export default function ItemDetail() {
                             <p><strong>Date:</strong> {new Date(item.date).toLocaleDateString()}</p>
                             <p><strong>Type:</strong> <span className={`px-2 py-1 rounded text-xs font-bold ${item.type === 'lost' ? 'bg-red-100 text-red-700' : 'bg-emerald-100 text-emerald-700'}`}>{item.type}</span></p>
                         </div>
+
+                        {/* What Next Guidance for Non-Owners */}
+                        {!isOwner && (
+                            <div className="mt-8 p-4 bg-indigo-50 dark:bg-indigo-900/20 rounded-xl border-2 border-indigo-200 dark:border-indigo-800">
+                                <p className="text-sm text-slate-700 dark:text-slate-300">
+                                    💡 <strong>Is this yours?</strong> Go to Browse and click "This is mine!" to let the owner know.
+                                </p>
+                            </div>
+                        )}
                     </motion.div>
                 )}
             </div>

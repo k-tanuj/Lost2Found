@@ -248,10 +248,10 @@ export default function Login() {
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-16 relative">
-                        <Step index={0} icon={ClipboardList} title="Report" desc="Instantly upload a photo of what you lost or found." />
-                        <Step index={1} icon={Radar} title="Match" desc="Our AI scans the campus network for visual similarities." />
-                        <Step index={2} icon={QrCode} title="Claim" desc="Verify ownership via encrypted handover passports." />
-                        <Step index={3} icon={HandHeart} title="Return" desc="Meet at a safe hotspot and complete the reunion." />
+                        <Step index={0} icon={ClipboardList} title="Report" desc="Upload a photo of what you lost or found." />
+                        <Step index={1} icon={Radar} title="Match" desc="Our system finds visual similarities automatically." />
+                        <Step index={2} icon={UserCheck} title="Confirm" desc="Owner confirms if it's theirs." />
+                        <Step index={3} icon={HandHeart} title="Reconnect" desc="We share contact info to arrange pickup." />
                     </div>
                 </div>
             </section>
