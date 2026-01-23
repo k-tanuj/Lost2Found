@@ -1,15 +1,17 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { getUserItems } from '../services/api';
+import { getUserItems, deleteItem } from '../services/api';
 import { getUserFacingStatus, getUserAction } from '../utils/userFacingStatus';
 import { motion } from 'framer-motion';
-import { Package, ArrowRight } from 'lucide-react';
+import { Package, ArrowRight, Trash2 } from 'lucide-react';
 import Navbar from '../components/Navbar';
+import { useNotification } from '../context/NotificationContext';
 
 export default function MyReports() {
     const { currentUser } = useAuth();
     const navigate = useNavigate();
+    const notification = useNotification();
     const [items, setItems] = useState([]);
     const [loading, setLoading] = useState(true);
 
@@ -28,6 +30,18 @@ export default function MyReports() {
         };
         fetchItems();
     }, [currentUser]);
+
+    const handleDelete = async (itemId, itemTitle) => {
+        if (window.confirm(`Are you sure you want to delete "${itemTitle}"? This cannot be undone.`)) {
+            try {
+                await deleteItem(itemId);
+                setItems(items.filter(item => item.id !== itemId));
+                notification.success('Report deleted successfully');
+            } catch (error) {
+                notification.error('Failed to delete report');
+            }
+        }
+    };
 
     if (loading) {
         return (
@@ -190,13 +204,23 @@ export default function MyReports() {
                                             )}
 
                                             {/* Action Button (Max ONE, or none) - Hide for RESOLVED items */}
-                                            {action.needsAction && item.status !== 'RESOLVED' && (
+                                            <div className="flex items-center gap-3">
+                                                {action.needsAction && item.status !== 'RESOLVED' && (
+                                                    <button
+                                                        onClick={() => navigate(`/item/${item.id}`)}
+                                                        className="inline-flex items-center gap-2 px-6 py-3 bg-teal-500 hover:bg-teal-600 text-white font-bold rounded-full transition-all shadow-lg">
+                                                        {action.actionText} <ArrowRight className="w-5 h-5" />
+                                                    </button>
+                                                )}
+
+                                                {/* Delete Button - Always show for user's own items */}
                                                 <button
-                                                    onClick={() => navigate(`/item/${item.id}`)}
-                                                    className="inline-flex items-center gap-2 px-6 py-3 bg-teal-500 hover:bg-teal-600 text-white font-bold rounded-full transition-all shadow-lg">
-                                                    {action.actionText} <ArrowRight className="w-5 h-5" />
+                                                    onClick={() => handleDelete(item.id, item.title)}
+                                                    className="inline-flex items-center gap-2 px-4 py-3 bg-red-50 hover:bg-red-100 text-red-600 font-bold rounded-full transition-all border-2 border-red-200"
+                                                    title="Delete this report">
+                                                    <Trash2 className="w-5 h-5" />
                                                 </button>
-                                            )}
+                                            </div>
                                         </div>
                                     </div>
                                 </motion.div>

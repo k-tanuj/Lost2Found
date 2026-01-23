@@ -25,4 +25,7 @@ router.post('/:type', verifyToken, reportLimiter, validate(schemas.item), (req, 
 router.get('/detail/:id', itemsController.getItemById);
 router.put('/:id/status', verifyToken, itemsController.updateItemStatus);
 
+// Delete item (only owner can delete)
+router.delete('/:id', verifyToken, itemsController.deleteItem);
+
 module.exports = router;

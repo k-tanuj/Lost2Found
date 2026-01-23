@@ -422,3 +422,46 @@ exports.updateItemStatus = async (req, res) => {
         res.status(500).json({ error: "Failed to update item status" });
     }
 };
+
+// NEW: Delete item endpoint
+exports.deleteItem = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const userId = req.user.uid;
+
+        const itemRef = db.collection('items').doc(id);
+        const itemDoc = await itemRef.get();
+
+        if (!itemDoc.exists) {
+            return res.status(404).json({ error: "Item not found" });
+        }
+
+        const itemData = itemDoc.data();
+
+        // Authorization: Only owner can delete
+        if (itemData.userId !== userId) {
+            return res.status(403).json({ error: "You can only delete your own reports" });
+        }
+
+        // Delete the item
+        await itemRef.delete();
+
+        // Optional: Delete related notifications
+        const notificationsSnapshot = await db.collection('notifications')
+            .where('itemId', '==', id)
+            .get();
+
+        const batch = db.batch();
+        notificationsSnapshot.forEach(doc => {
+            batch.delete(doc.ref);
+        });
+        await batch.commit();
+
+        res.json({ success: true, message: "Report deleted successfully" });
+    } catch (error) {
+        console.error("Error deleting item:", error);
+        res.status(500).json({ error: "Failed to delete item" });
+    }
+};
+
+module.exports = exports;

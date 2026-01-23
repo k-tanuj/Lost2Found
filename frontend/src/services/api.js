@@ -151,3 +151,14 @@ export const markNotificationRead = async (id) => {
         throw error;
     }
 };
+
+export const deleteItem = async (itemId) => {
+    try {
+        const config = await getAuthHeaders();
+        const response = await axios.delete(`${API_URL}/items/${itemId}`, config);
+        return response.data;
+    } catch (error) {
+        console.error("Error deleting item:", error);
+        throw error;
+    }
+};
