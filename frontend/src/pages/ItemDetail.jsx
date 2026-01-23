@@ -346,7 +346,8 @@ export default function ItemDetail() {
                                         {item.status !== 'RESOLVED' && " Click below to close the case after exchange."}
                                     </p>
 
-                                    {isOwner && item.status !== 'RESOLVED' && (
+                                    {/* Show Resolve Button for Owner OR Verified Claimant */}
+                                    {(isOwner || (currentUser && item.claimantId === currentUser.uid)) && item.status !== 'RESOLVED' && (
                                         <button
                                             onClick={handleMarkResolved}
                                             disabled={actionLoading}
