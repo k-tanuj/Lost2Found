@@ -37,7 +37,11 @@ exports.findMatchesForId = async (req, res) => {
 
         const candidateItems = [];
         candidatesSnapshot.forEach(doc => {
-            candidateItems.push({ id: doc.id, ...doc.data() });
+            const data = doc.data();
+            // Filter out items that are already resolved or verified (taken)
+            if (data.status !== 'RESOLVED' && data.status !== 'VERIFIED') {
+                candidateItems.push({ id: doc.id, ...data });
+            }
         });
 
         if (candidateItems.length === 0) {
