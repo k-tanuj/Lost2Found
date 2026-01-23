@@ -392,6 +392,36 @@ exports.updateItemStatus = async (req, res) => {
             return res.status(400).json({ error: transitionResult.error });
         }
 
+        // If transitioning to VERIFIED, store claimant info from notification
+        if (status === ITEM_STATUS.VERIFIED) {
+            try {
+                // Find the claim request notification to get claimant info
+                const notifSnapshot = await db.collection('notifications')
+                    .where('itemId', '==', id)
+                    .where('type', '==', 'CLAIM_REQUEST')
+                    .limit(1)
+                    .get();
+
+                if (!notifSnapshot.empty) {
+                    const notifData = notifSnapshot.docs[0].data();
+                    const claimantId = notifData.relatedUserId;
+
+                    // Fetch claimant user details
+                    const claimantUser = await adminAuth.getUser(claimantId);
+
+                    // Store claimant info in item
+                    await itemRef.update({
+                        claimantId: claimantId,
+                        claimantEmail: claimantUser.email,
+                        claimantName: claimantUser.displayName || 'User'
+                    });
+                }
+            } catch (err) {
+                console.error("Failed to store claimant info:", err.message);
+                // Don't fail the request if this fails
+            }
+        }
+
         // Notify Claimant via Email if item is resolved
         if ((status === ITEM_STATUS.RESOLVED) && itemData.claimantId) {
             try {

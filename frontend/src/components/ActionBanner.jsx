@@ -21,9 +21,8 @@ export default function ActionBanner({ count }) {
                     </div>
                     <div className="order-3 mt-0 flex-shrink-0 w-auto">
                         <button
-                            onClick={() => navigate('/activity')}
-                            className="flex items-center justify-center px-4 py-1.5 border border-transparent rounded-full shadow-sm text-xs font-bold text-indigo-600 bg-white hover:bg-indigo-50 transition-all group"
-                        >
+                            onClick={() => navigate('/my-reports')}
+                            className="flex items-center justify-center px-4 py-1.5 border border-transparent rounded-full shadow-sm text-xs font-bold text-indigo-600 bg-white hover:bg-indigo-50 transition-all group">
                             Check it out
                             <ArrowRight className="ml-2 w-3 h-3 group-hover:translate-x-1 transition-transform" />
                         </button>
