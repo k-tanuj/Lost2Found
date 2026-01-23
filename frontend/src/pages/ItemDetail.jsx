@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { getItemById, updateItemStatus, claimItem } from '../services/api';
+import { getItemById, updateItemStatus, claimItem, getMatches } from '../services/api';
 import { ITEM_STATUS } from '../constants/itemStatus';
 import { getUserFacingStatus } from '../utils/userFacingStatus';
 import { useAuth } from '../context/AuthContext';
@@ -17,22 +17,35 @@ export default function ItemDetail() {
     const [item, setItem] = useState(null);
     const [loading, setLoading] = useState(true);
     const [actionLoading, setActionLoading] = useState(false);
-    const [showClaimForm, setShowClaimForm] = useState(false);
-    const [claimProof, setClaimProof] = useState('');
+    const [matches, setMatches] = useState([]);
+    const [matchesLoading, setMatchesLoading] = useState(false);
 
     useEffect(() => {
-        const fetchItem = async () => {
+        const fetchItemAndMatches = async () => {
             try {
                 const data = await getItemById(id);
                 setItem(data);
+
+                // If current user is owner, fetch matches
+                if (currentUser && data.userId === currentUser.uid) {
+                    setMatchesLoading(true);
+                    try {
+                        const matchData = await getMatches(id);
+                        setMatches(matchData);
+                    } catch (err) {
+                        console.error("Failed to fetch matches", err);
+                    } finally {
+                        setMatchesLoading(false);
+                    }
+                }
             } catch (error) {
                 console.error("Failed to fetch item", error);
             } finally {
                 setLoading(false);
             }
         };
-        if (id) fetchItem();
-    }, [id]);
+        if (id && currentUser) fetchItemAndMatches();
+    }, [id, currentUser]);
 
     if (loading) {
         return (
@@ -244,6 +257,73 @@ export default function ItemDetail() {
                                         </div>
                                     </div>
                                 )}
+                            </div>
+                        )}
+                        {/* Matches Section for Owner */}
+                        {isOwner && (
+                            <div className="mt-12 border-t border-slate-200 dark:border-slate-800 pt-8">
+                                <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-6">Potential Matches</h2>
+                                {matchesLoading ? (
+                                    <p className="text-slate-500">Searching for matches...</p>
+                                ) : matches.length > 0 ? (
+                                    <div className="grid gap-6 md:grid-cols-2">
+                                        {matches.map(match => (
+                                            <div key={match.id} className="bg-slate-50 dark:bg-slate-800 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 hover:shadow-lg transition-shadow">
+                                                <div className="flex gap-4 mb-4">
+                                                    {match.imageUrl && (
+                                                        <img src={match.imageUrl} alt={match.title} className="w-20 h-20 object-cover rounded-lg bg-slate-200" />
+                                                    )}
+                                                    <div>
+                                                        <h3 className="font-bold text-slate-900 dark:text-white">{match.title}</h3>
+                                                        <span className={`inline-block px-2 py-0.5 rounded text-xs font-bold mt-1 ${match.type === 'lost' ? 'bg-red-100 text-red-700' : 'bg-emerald-100 text-emerald-700'}`}>
+                                                            {match.type.toUpperCase()}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                                <button
+                                                    onClick={() => navigate(`/item/${match.id}`)}
+                                                    className="w-full py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl transition-colors text-sm"
+                                                >
+                                                    View & Claim
+                                                </button>
+                                            </div>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <p className="text-slate-500 italic">No matches found yet. We'll notify you if we find something!</p>
+                                )}
+                            </div>
+                        )}
+
+                        {/* Contact Info for Verified Items */}
+                        {(item.status === 'VERIFIED' || item.status === 'RESOLVED') && (
+                            <div className="mt-8 p-6 bg-teal-50 dark:bg-teal-900/20 rounded-2xl border-2 border-teal-500">
+                                <h3 className="text-xl font-bold text-teal-800 dark:text-teal-300 mb-4">🎉 It's a Match! Connect now</h3>
+                                <div className="space-y-4">
+                                    {isOwner ? (
+                                        // Owner sees Claimant info
+                                        <div className="bg-white dark:bg-slate-800 p-4 rounded-xl border border-teal-100 dark:border-teal-800">
+                                            <p className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-1">Contact the finder</p>
+                                            <p className="text-lg font-bold text-slate-900 dark:text-white">{item.claimantName || 'User'}</p>
+                                            <a href={`mailto:${item.claimantEmail}`} className="text-indigo-600 dark:text-indigo-400 font-medium hover:underline flex items-center gap-2 mt-1">
+                                                {item.claimantEmail}
+                                            </a>
+                                        </div>
+                                    ) : (
+                                        // Claimant sees Owner info
+                                        <div className="bg-white dark:bg-slate-800 p-4 rounded-xl border border-teal-100 dark:border-teal-800">
+                                            <p className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-1">Contact the owner</p>
+                                            <p className="text-lg font-bold text-slate-900 dark:text-white">{item.userName || 'User'}</p>
+                                            <a href={`mailto:${item.userEmail}`} className="text-indigo-600 dark:text-indigo-400 font-medium hover:underline flex items-center gap-2 mt-1">
+                                                {item.userEmail}
+                                            </a>
+                                        </div>
+                                    )}
+                                    <p className="text-sm text-slate-500 text-center mt-4">
+                                        Please arrange a safe meet-up to return the item.
+                                        {item.status !== 'RESOLVED' && " Mark as resolved in My Reports after exchange."}
+                                    </p>
+                                </div>
                             </div>
                         )}
                     </motion.div>
