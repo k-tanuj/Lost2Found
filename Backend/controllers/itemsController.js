@@ -421,6 +421,32 @@ exports.updateItemStatus = async (req, res) => {
                         claimantEmail: claimantUser.email,
                         claimantName: claimantUser.displayName || 'User'
                     });
+
+                    // MUTUAL RESOLUTION: Auto-verify counterpart item
+                    try {
+                        const counterpartType = itemData.type === 'found' ? 'lost' : 'found';
+                        const claimantItemsSnapshot = await db.collection('items')
+                            .where('userId', '==', claimantId)
+                            .where('type', '==', counterpartType)
+                            .where('status', 'in', ['REPORTED', 'MATCH_FOUND', 'CLAIM_REQUESTED', 'active'])
+                            .orderBy('createdAt', 'desc')
+                            .limit(1)
+                            .get();
+
+                        if (!claimantItemsSnapshot.empty) {
+                            const counterpartItemDoc = claimantItemsSnapshot.docs[0];
+                            await db.collection('items').doc(counterpartItemDoc.id).update({
+                                status: ITEM_STATUS.VERIFIED,
+                                claimantId: itemData.userId,
+                                claimantEmail: "Linked via Match",
+                                claimantName: "Linked via Match",
+                                updatedAt: new Date().toISOString()
+                            });
+                            console.log(`Auto-verified counterpart item ${counterpartItemDoc.id}`);
+                        }
+                    } catch (e) {
+                        console.error("Mutual resolution error:", e);
+                    }
                 }
             } catch (err) {
                 console.error("Failed to store claimant info:", err.message);
