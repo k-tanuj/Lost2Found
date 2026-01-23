@@ -225,7 +225,7 @@ export default function ItemDetail() {
                         </div>
 
                         {/* Claim Button for Non-Owners */}
-                        {!isOwner && item.status !== 'RESOLVED' && (
+                        {!isOwner && item.status !== 'RESOLVED' && item.status !== 'VERIFIED' && (
                             <div className="mt-8">
                                 {!showClaimForm ? (
                                     <button
