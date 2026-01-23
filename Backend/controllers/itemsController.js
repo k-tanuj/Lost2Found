@@ -13,6 +13,11 @@ exports.getItems = async (req, res) => {
         const { type } = req.params; // 'lost' or 'found'
 
         let query = db.collection('items');
+
+        // CRITICAL: Filter out RESOLVED items from public views
+        // Resolved items should only appear in user's own reports
+        query = query.where('status', '!=', ITEM_STATUS.RESOLVED);
+
         if (type && type !== 'all') {
             query = query.where('type', '==', type);
         }
@@ -148,9 +153,10 @@ exports.createItem = async (req, res) => {
             const aiController = require('./aiController');
             const candidateType = itemData.type === 'lost' ? 'found' : 'lost';
 
-            // Fetch candidates
+            // Fetch candidates (exclude RESOLVED items)
             const candidatesSnapshot = await db.collection('items')
                 .where('type', '==', candidateType)
+                .where('status', '!=', ITEM_STATUS.RESOLVED)
                 .get();
 
             if (!candidatesSnapshot.empty) {

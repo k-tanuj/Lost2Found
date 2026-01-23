@@ -139,50 +139,61 @@ export default function MyReports() {
                                                 {userStatus}
                                             </p>
 
-                                            {/* What you need to do */}
-                                            <div className="mb-4 p-4 bg-indigo-50 dark:bg-indigo-900/20 rounded-xl border-2 border-indigo-200 dark:border-indigo-800">
-                                                <p className="text-sm font-bold text-indigo-900 dark:text-indigo-300 mb-2">
-                                                    👉 What you need to do:
-                                                </p>
-                                                {action.needsAction ? (
-                                                    <p className="text-sm text-slate-700 dark:text-slate-300">
-                                                        Review their information and decide if this item belongs to them.
+                                            {/* RESOLVED Item - Closure Message */}
+                                            {item.status === 'RESOLVED' ? (
+                                                <div className="p-4 bg-emerald-50 dark:bg-emerald-900/20 rounded-xl border-2 border-emerald-500">
+                                                    <p className="text-emerald-700 dark:text-emerald-300 font-bold flex items-center gap-2">
+                                                        ✅ Item returned successfully.
                                                     </p>
-                                                ) : isVerified ? (
-                                                    <div className="space-y-2">
+                                                    <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">
+                                                        This case is closed. No further action is needed.
+                                                    </p>
+                                                </div>
+                                            ) : (
+                                                /* What you need to do - Only for active items */
+                                                <div className="mb-4 p-4 bg-indigo-50 dark:bg-indigo-900/20 rounded-xl border-2 border-indigo-200 dark:border-indigo-800">
+                                                    <p className="text-sm font-bold text-indigo-900 dark:text-indigo-300 mb-2">
+                                                        👉 What you need to do:
+                                                    </p>
+                                                    {action.needsAction ? (
                                                         <p className="text-sm text-slate-700 dark:text-slate-300">
-                                                            Arrange pickup or handoff with the other person.
+                                                            Review their information and decide if this item belongs to them.
                                                         </p>
-                                                        {item.claimantEmail && (
-                                                            <div className="mt-3 p-3 bg-white dark:bg-slate-800 rounded-lg">
-                                                                <p className="text-xs font-bold text-slate-600 dark:text-slate-400 mb-1">Contact them:</p>
-                                                                <a href={`mailto:${item.claimantEmail}`} className="text-sm text-indigo-600 dark:text-indigo-400 hover:underline font-medium">
-                                                                    {item.claimantEmail}
-                                                                </a>
-                                                            </div>
-                                                        )}
-                                                        {item.userEmail && item.userId !== currentUser.uid && (
-                                                            <div className="mt-3 p-3 bg-white dark:bg-slate-800 rounded-lg">
-                                                                <p className="text-xs font-bold text-slate-600 dark:text-slate-400 mb-1">Contact them:</p>
-                                                                <a href={`mailto:${item.userEmail}`} className="text-sm text-indigo-600 dark:text-indigo-400 hover:underline font-medium">
-                                                                    {item.userEmail}
-                                                                </a>
-                                                            </div>
-                                                        )}
-                                                    </div>
-                                                ) : (
-                                                    <p className="text-sm text-slate-700 dark:text-slate-300">
-                                                        Nothing! Just wait. We'll notify you if we find something.
-                                                    </p>
-                                                )}
-                                            </div>
+                                                    ) : isVerified ? (
+                                                        <div className="space-y-2">
+                                                            <p className="text-sm text-slate-700 dark:text-slate-300">
+                                                                Arrange pickup or handoff with the other person.
+                                                            </p>
+                                                            {item.claimantEmail && (
+                                                                <div className="mt-3 p-3 bg-white dark:bg-slate-800 rounded-lg">
+                                                                    <p className="text-xs font-bold text-slate-600 dark:text-slate-400 mb-1">Contact them:</p>
+                                                                    <a href={`mailto:${item.claimantEmail}`} className="text-sm text-indigo-600 dark:text-indigo-400 hover:underline font-medium">
+                                                                        {item.claimantEmail}
+                                                                    </a>
+                                                                </div>
+                                                            )}
+                                                            {item.userEmail && item.userId !== currentUser.uid && (
+                                                                <div className="mt-3 p-3 bg-white dark:bg-slate-800 rounded-lg">
+                                                                    <p className="text-xs font-bold text-slate-600 dark:text-slate-400 mb-1">Contact them:</p>
+                                                                    <a href={`mailto:${item.userEmail}`} className="text-sm text-indigo-600 dark:text-indigo-400 hover:underline font-medium">
+                                                                        {item.userEmail}
+                                                                    </a>
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    ) : (
+                                                        <p className="text-sm text-slate-700 dark:text-slate-300">
+                                                            Nothing! Just wait. We'll notify you if we find something.
+                                                        </p>
+                                                    )}
+                                                </div>
+                                            )}
 
-                                            {/* Action Button (Max ONE, or none) */}
-                                            {action.needsAction && (
+                                            {/* Action Button (Max ONE, or none) - Hide for RESOLVED items */}
+                                            {action.needsAction && item.status !== 'RESOLVED' && (
                                                 <button
                                                     onClick={() => navigate(`/item/${item.id}`)}
-                                                    className="inline-flex items-center gap-2 px-6 py-3 bg-teal-500 hover:bg-teal-600 text-white font-bold rounded-full transition-all shadow-lg"
-                                                >
+                                                    className="inline-flex items-center gap-2 px-6 py-3 bg-teal-500 hover:bg-teal-600 text-white font-bold rounded-full transition-all shadow-lg">
                                                     {action.actionText} <ArrowRight className="w-5 h-5" />
                                                 </button>
                                             )}

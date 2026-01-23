@@ -163,6 +163,18 @@ export default function ItemDetail() {
 
                         <h1 className="text-4xl font-black text-slate-900 dark:text-white mb-4">{item.title}</h1>
 
+                        {/* RESOLVED Item - Closure Message */}
+                        {item.status === 'RESOLVED' && (
+                            <div className="p-6 bg-emerald-50 dark:bg-emerald-900/20 rounded-xl border-2 border-emerald-500 mb-8">
+                                <h3 className="font-bold text-emerald-700 dark:text-emerald-300 mb-2 flex items-center gap-2">
+                                    ✅ This case is closed
+                                </h3>
+                                <p className="text-slate-600 dark:text-slate-400">
+                                    This item has been successfully returned. No further action is needed.
+                                </p>
+                            </div>
+                        )}
+
                         {/* User-Facing Status */}
                         <p className="text-xl text-slate-700 dark:text-slate-300 font-medium mb-8">
                             {userStatus}
