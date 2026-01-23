@@ -57,7 +57,7 @@ export default function Browse() {
 
         try {
             await claimItem(itemId, '', claimProof); // Pass empty message, proof as third param
-            notification.success("Submitted! The owner will review your request.");
+            notification.success("Sent! They'll check and get back to you.");
             setClaimingId(null);
             setClaimProof('');
             // Refresh items
@@ -65,7 +65,7 @@ export default function Browse() {
             const foundItems = data.filter(item => item.userId !== currentUser?.uid && item.type === 'found');
             setItems(foundItems);
         } catch (error) {
-            notification.error('Something went wrong. Please try again in a moment.');
+            notification.error('Oops! Try again in a moment.');
         }
     };
 

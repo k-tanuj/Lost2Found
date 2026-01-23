@@ -16,6 +16,24 @@ app_port: 7860
 
 ---
 
+## 🎯 For Judges - Quick Start
+
+**What is this?** Lost2Found helps people report lost items and reconnect them with found ones.
+
+**How to use it in 30 seconds:**
+
+1. **Sign up** - Create an account (or use the live demo)
+2. **Report something** - Click "Report Lost" or "Report Found" 
+3. **AI finds matches** - System automatically compares items
+4. **Review matches** - Owner confirms if it's theirs
+5. **Connect** - System shares contact info to arrange pickup
+
+**Try it live:** https://k-tanuj-lost2found.hf.space/
+
+**Best demo flow:** Report a lost item → Browse items → Claim an item → See the notification system in action
+
+---
+
 ## 🧠 Overview
 
 **Lost2Found** is a modern web platform tailored for university campuses. It enables students to report lost or found items, receive real-time notifications, and track the full lifecycle of items — from reporting to successful return.

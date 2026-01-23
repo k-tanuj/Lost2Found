@@ -15,8 +15,8 @@ export default function ActionBanner({ count }) {
                             <AlertCircle className="h-4 w-4 text-white animate-pulse" aria-hidden="true" />
                         </span>
                         <p className="ml-3 font-bold text-white text-sm truncate">
-                            <span className="md:hidden">Action Required: {count} claim pending</span>
-                            <span className="hidden md:inline">You have {count} item claim request(s) awaiting your review.</span>
+                            <span className="md:hidden">Someone needs your help!</span>
+                            <span className="hidden md:inline">Someone says an item is theirs. Please review.</span>
                         </p>
                     </div>
                     <div className="order-3 mt-0 flex-shrink-0 w-auto">
@@ -24,7 +24,7 @@ export default function ActionBanner({ count }) {
                             onClick={() => navigate('/activity')}
                             className="flex items-center justify-center px-4 py-1.5 border border-transparent rounded-full shadow-sm text-xs font-bold text-indigo-600 bg-white hover:bg-indigo-50 transition-all group"
                         >
-                            Review Now
+                            Check it out
                             <ArrowRight className="ml-2 w-3 h-3 group-hover:translate-x-1 transition-transform" />
                         </button>
                     </div>

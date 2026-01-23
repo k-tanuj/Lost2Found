@@ -12,9 +12,9 @@
 export const getUserFacingStatus = (systemStatus, itemData = {}) => {
     const statusMap = {
         'REPORTED': "We're looking for your item.",
-        'MATCH_FOUND': "We may have found your item.",
-        'CLAIM_REQUESTED': "Someone thinks this might be theirs.",
-        'VERIFIED': "Great news! We found the owner.",
+        'MATCH_FOUND': "Good news! We might have found your item.",
+        'CLAIM_REQUESTED': "Someone says this is theirs.",
+        'VERIFIED': "Perfect! We connected you two.",
         'RESOLVED': "All done. Glad we could help!",
         'REJECTED': "That wasn't a match. We're still looking.",
         'SECURED': "This item is safely stored."
